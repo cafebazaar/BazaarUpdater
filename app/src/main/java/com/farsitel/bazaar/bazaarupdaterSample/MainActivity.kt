@@ -1,7 +1,6 @@
 package com.farsitel.bazaar.bazaarupdaterSample
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -23,7 +22,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         BazaarUpdater.getLastUpdateVersion(context = this) { result ->
             result.doOnUpdateNeeded { version ->
-                Toast.makeText(this, "version: $version", Toast.LENGTH_SHORT).show()
+                BazaarUpdater.updateApplication(this)
             }
         }
         setContent {

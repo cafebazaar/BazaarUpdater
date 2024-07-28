@@ -2,6 +2,7 @@ package com.farsitel.bazaar.updater
 
 import android.content.Context
 import android.content.Intent
+import androidx.core.net.toUri
 import com.farsitel.bazaar.updater.Security.verifyBazaarIsInstalled
 import com.farsitel.bazaar.updater.VersionParser.parseUpdateResponse
 import java.lang.ref.WeakReference
@@ -9,12 +10,22 @@ import java.lang.ref.WeakReference
 object BazaarUpdater {
 
     private var connection: WeakReference<UpdateServiceConnection>? = null
+
     fun getLastUpdateVersion(context: Context, onResult: (UpdateResult) -> Unit) {
         if (verifyBazaarIsInstalled(context).not()) {
             onResult(UpdateResult.Error(ERROR_BAZAAR_IS_NOT_INSTALL))
         } else {
             initService(context, onResult)
         }
+    }
+
+    fun updateApplication(context: Context) {
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            "$BAZAAR_THIRD_PARTY_APP_DETAIL${context.packageName}".toUri()
+        )
+        intent.setPackage(BAZAAR_PACKAGE_NAME)
+        context.startActivity(intent)
     }
 
     private fun initService(context: Context, onResult: (UpdateResult) -> Unit) {

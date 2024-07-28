@@ -14,14 +14,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.farsitel.bazaar.bazaarupdaterSample.ui.theme.BazaarupdaterSampleTheme
 import com.farsitel.bazaar.updater.BazaarUpdater
+import com.farsitel.bazaar.updater.doOnUpdateNeeded
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        BazaarUpdater.getLastUpdateVersion(activity = this) { version ->
-            Toast.makeText(this, "version: $version", Toast.LENGTH_SHORT).show()
+        BazaarUpdater.getLastUpdateVersion(context = this) { result ->
+            result.doOnUpdateNeeded { version ->
+                Toast.makeText(this, "version: $version", Toast.LENGTH_SHORT).show()
+            }
         }
         setContent {
             BazaarupdaterSampleTheme {

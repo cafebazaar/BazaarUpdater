@@ -7,6 +7,10 @@ android {
     namespace = "com.farsitel.bazaar.updater"
     compileSdk = 34
 
+    buildFeatures {
+        aidl = true
+    }
+
     defaultConfig {
         minSdk = 21
 
@@ -34,8 +38,8 @@ android {
 
 dependencies {
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
+//    implementation(libs.androidx.core.ktx)
+//    implementation(libs.androidx.appcompat)
     implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

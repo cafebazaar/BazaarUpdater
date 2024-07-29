@@ -2,7 +2,6 @@ package com.farsitel.bazaar.updater
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.core.net.toUri
 import com.farsitel.bazaar.updater.Security.verifyBazaarIsInstalled
 import com.farsitel.bazaar.updater.VersionParser.parseUpdateResponse

@@ -9,4 +9,4 @@ internal const val BAZAAR_ERROR_RESULT = -1L
 //errors
 internal const val ERROR_BAZAAR_IS_NOT_INSTALL = "Bazaar is not install in your device!"
 internal const val ERROR_CORRECT_VERSION = "There is some problems, maybe the sign or package" +
-        " Name is not same as the application published on Bazaar!"
+        " Name is not same as the application published on Bazaar or maybe Bazaar client is not sync"

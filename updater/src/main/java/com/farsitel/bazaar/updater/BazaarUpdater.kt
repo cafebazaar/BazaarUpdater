@@ -2,6 +2,7 @@ package com.farsitel.bazaar.updater
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.core.net.toUri
 import com.farsitel.bazaar.updater.Security.verifyBazaarIsInstalled
 import com.farsitel.bazaar.updater.VersionParser.parseUpdateResponse
@@ -20,21 +21,31 @@ object BazaarUpdater {
     }
 
     fun updateApplication(context: Context) {
-        val intent = Intent(
-            Intent.ACTION_VIEW,
-            "$BAZAAR_THIRD_PARTY_APP_DETAIL${context.packageName}".toUri()
-        )
-        intent.setPackage(BAZAAR_PACKAGE_NAME)
+        val intent = if (verifyBazaarIsInstalled(context).not()) {
+            Intent(Intent.ACTION_VIEW, "$BAZAAR_WEB_APP_DETAIL${context.packageName}".toUri())
+        } else {
+            Intent(
+                Intent.ACTION_VIEW, "$BAZAAR_THIRD_PARTY_APP_DETAIL${context.packageName}".toUri()
+            ).apply {
+                setPackage(BAZAAR_PACKAGE_NAME)
+            }
+        }
         context.startActivity(intent)
     }
 
     private fun initService(context: Context, onResult: (UpdateResult) -> Unit) {
         connection = WeakReference(
-            UpdateServiceConnection(packageName = context.packageName) { updateVersion ->
-                onResult(parseUpdateResponse(version = updateVersion, context = context))
-                releaseService(context)
-            }
-        )
+            UpdateServiceConnection(
+                packageName = context.packageName,
+                onResult = { updateVersion ->
+                    onResult(parseUpdateResponse(version = updateVersion, context = context))
+                    releaseService(context)
+                },
+                onError = { message ->
+                    onResult(UpdateResult.Error(message))
+                    releaseService(context)
+                }
+            ))
 
         val intent = Intent(BAZAAR_UPDATE_INTENT)
         intent.setPackage(BAZAAR_PACKAGE_NAME)

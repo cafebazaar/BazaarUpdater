@@ -7,7 +7,8 @@ import com.farsitel.bazaar.IUpdateCheckService
 
 class UpdateServiceConnection(
     private val packageName: String,
-    private val onResult: ((Long) -> Unit)
+    private val onResult: ((Long) -> Unit),
+    private val onError: ((String) -> Unit),
 ) : ServiceConnection {
 
     private var service: IUpdateCheckService? = null
@@ -18,7 +19,7 @@ class UpdateServiceConnection(
             val versionCode = service?.getVersionCode(packageName)
             versionCode?.let { onResult(it) }
         } catch (e: Exception) {
-            e.printStackTrace()
+            onError(e.message.orEmpty())
         }
     }
 

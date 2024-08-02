@@ -37,6 +37,8 @@ dependencies {
 }
 ```
 
+**groovy**
+
 ```groovy
 dependencies {
     implementation 'com.github.hamid97m:bazaarUpdater:1.0.0-alpha5'

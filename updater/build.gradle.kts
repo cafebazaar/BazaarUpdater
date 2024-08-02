@@ -43,6 +43,12 @@ android {
         }
     }
 }
+
+dependencies {
+
+    implementation(libs.androidx.core.ktx)
+
+}
 publishing {
     publications {
         create("release", MavenPublication::class) {

@@ -84,3 +84,9 @@ To update your application when a new version is available on Bazaar, simply cal
 
 ## Contributing
 Contributions are welcome! If you have suggestions or improvements, please open an issue or submit a pull request
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+

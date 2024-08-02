@@ -2,7 +2,7 @@
 
 [![GitHub License](https://img.shields.io/github/license/cafebazaar/BazaarPay)](https://www.apache.org/licenses/LICENSE-2.0)
 
-BazaarUpdater is an Android library that helps you easily check for updates for your application on Bazaar and manage the update process.
+BazaarUpdater is an Android library that simplifies checking for updates and managing the update process for your application on Bazaar.
 
 ## Setup
 

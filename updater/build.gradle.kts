@@ -6,14 +6,14 @@ plugins {
 
 android {
     namespace = "com.farsitel.bazaar.updater"
-    compileSdk = 34
+    compileSdk = 31
 
     buildFeatures {
         aidl = true
     }
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 17
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -54,7 +54,7 @@ publishing {
         create("release", MavenPublication::class) {
             groupId = "com.farsitel.bazaar"
             artifactId = "updater"
-            version = "1.0.0-alpha"
+            version = "1.0.0-alpha5"
 
             afterEvaluate {
                 from(components["release"])

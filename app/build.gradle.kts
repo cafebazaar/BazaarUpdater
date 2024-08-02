@@ -1,6 +1,18 @@
+buildscript {
+    repositories {
+        gradlePluginPortal()
+        // mavenCentral() include if you need plugins from other repositories
+        // google() include if you need plugins from other repositories
+    }
+
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0")
+        // other plugin dependencies...
+    }
+}
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
+    id("org.jetbrains.kotlin.android")
     alias(libs.plugins.compose.compiler)
 }
 

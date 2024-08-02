@@ -121,7 +121,13 @@ private fun CheckUpdateStateView(context: Context, onResult: (UpdateResult) -> U
 }
 
 private fun checkUpdateState(context: Context, onResult: (UpdateResult) -> Unit) {
-    BazaarUpdater.getLastUpdateVersion(context = context, onResult = onResult)
+    BazaarUpdater.getLastUpdateState(context = context){ result->
+        when(result){
+            UpdateResult.AlreadyUpdated -> TODO()
+            is UpdateResult.Error -> TODO()
+            is UpdateResult.NeedUpdate -> result.targetVersion
+        }
+    }
 }
 
 @Preview(showBackground = true)

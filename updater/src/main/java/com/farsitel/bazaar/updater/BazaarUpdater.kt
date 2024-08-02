@@ -11,7 +11,7 @@ object BazaarUpdater {
 
     private var connection: WeakReference<UpdateServiceConnection>? = null
 
-    fun getLastUpdateVersion(context: Context, onResult: (UpdateResult) -> Unit) {
+    fun getLastUpdateState(context: Context, onResult: (UpdateResult) -> Unit) {
         if (verifyBazaarIsInstalled(context).not()) {
             onResult(UpdateResult.Error(ERROR_BAZAAR_IS_NOT_INSTALL))
         } else {

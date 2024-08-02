@@ -117,17 +117,15 @@ private fun UpdateButton(
 
 @Composable
 private fun CheckUpdateStateView(context: Context, onResult: (UpdateResult) -> Unit) {
-    UpdateButton(context = context, onResult = onResult, text = stringResource(R.string.check_update))
+    UpdateButton(
+        context = context,
+        onResult = onResult,
+        text = stringResource(R.string.check_update)
+    )
 }
 
 private fun checkUpdateState(context: Context, onResult: (UpdateResult) -> Unit) {
-    BazaarUpdater.getLastUpdateState(context = context){ result->
-        when(result){
-            UpdateResult.AlreadyUpdated -> TODO()
-            is UpdateResult.Error -> TODO()
-            is UpdateResult.NeedUpdate -> result.targetVersion
-        }
-    }
+    BazaarUpdater.getLastUpdateState(context = context, onResult = onResult)
 }
 
 @Preview(showBackground = true)

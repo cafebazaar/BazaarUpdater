@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "BazaarupdaterSample"
 include(":app")
- 
+include(":updater")

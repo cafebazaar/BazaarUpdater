@@ -82,7 +82,9 @@ BazaarUpdater.getLastUpdateState(context = context) { result ->
 
 To update your application when a new version is available on Bazaar, simply call:
 
-`BazaarUpdater.updateApplication(context = context)`
+```kotlin
+BazaarUpdater.updateApplication(context = context)
+```
 
 ## Contributing
 Contributions are welcome! If you have suggestions or improvements, please open an issue or submit a pull request

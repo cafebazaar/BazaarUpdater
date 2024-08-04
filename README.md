@@ -1,7 +1,7 @@
 # BazaarUpdater Android SDK
 
 <p align="center">
-<img src="./images/sample.gif" alt="gif" width="300 ">
+<img src="./images/sample.gif" alt="gif" width="150 ">
 </p>
 
 [![GitHub License](https://img.shields.io/github/license/cafebazaar/BazaarPay)](https://www.apache.org/licenses/LICENSE-2.0)

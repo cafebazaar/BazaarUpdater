@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.jetbrains.kotlin.android.library)
+    alias(libs.plugins.jetbrains.kotlin.android)
     id("maven-publish")
 }
 
@@ -54,7 +54,7 @@ publishing {
         create("release", MavenPublication::class) {
             groupId = "com.farsitel.bazaar"
             artifactId = "updater"
-            version = "1.0.0-alpha5"
+            version = "1.0.0-beta1"
 
             afterEvaluate {
                 from(components["release"])

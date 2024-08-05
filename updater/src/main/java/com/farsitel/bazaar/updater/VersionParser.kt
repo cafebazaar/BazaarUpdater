@@ -7,7 +7,7 @@ internal object VersionParser {
 
     fun parseUpdateResponse(version: Long, context: Context): UpdateResult {
         return when {
-            version == BAZAAR_ERROR_RESULT -> UpdateResult.Error(ERROR_CORRECT_VERSION)
+            version == BAZAAR_ERROR_RESULT -> UpdateResult.Error(UnknownException())
             isUpdated(updatedVersion = version, context = context) -> UpdateResult.AlreadyUpdated
             else -> UpdateResult.NeedUpdate(version)
         }

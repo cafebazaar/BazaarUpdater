@@ -13,7 +13,7 @@ internal class UpdateServiceConnection(
     private val scope: CoroutineScope,
     private val bazaarVersionCode: Long,
     private val onResult: ((Long) -> Unit),
-    private val onError: ((String) -> Unit),
+    private val onError: ((Throwable) -> Unit),
 ) : ServiceConnection {
 
     private var service: IUpdateCheckService? = null
@@ -27,10 +27,14 @@ internal class UpdateServiceConnection(
                 } else {
                     service?.getVersionCode(packageName)
                 }
-                versionCode?.let { onResult(it) }
+                if (versionCode != null) {
+                    onResult(versionCode)
+                } else {
+                    onError(UnknownException())
+                }
             }
-        } catch (e: Exception) {
-            onError(e.message.orEmpty())
+        } catch (t: Throwable) {
+            onError(t)
         }
     }
 

@@ -56,7 +56,7 @@ private fun UpdateScreen(
     ) {
         when (val state = updateState.value) {
             UpdateResult.AlreadyUpdated -> AlreadyUpdatedView()
-            is UpdateResult.Error -> ErrorView(message = state.message)
+            is UpdateResult.Error -> ErrorView(message = state.throwable.message.orEmpty())
             is UpdateResult.NeedUpdate -> NeedUpdateView(
                 targetVersion = state.targetVersion,
                 onResult = {

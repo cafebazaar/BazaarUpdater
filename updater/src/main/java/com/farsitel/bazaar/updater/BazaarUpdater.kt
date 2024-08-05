@@ -23,7 +23,7 @@ object BazaarUpdater {
         onResult: (UpdateResult) -> Unit
     ) {
         if (verifyBazaarIsInstalled(context).not()) {
-            onResult(UpdateResult.Error(ERROR_BAZAAR_IS_NOT_INSTALL))
+            onResult(UpdateResult.Error(BazaarIsNotInstalledException()))
         } else {
             initService(
                 context = context,

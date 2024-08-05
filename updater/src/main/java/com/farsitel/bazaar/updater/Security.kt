@@ -9,6 +9,10 @@ internal object Security {
 
         return getPackageInfo(context, BAZAAR_PACKAGE_NAME) != null
     }
+
+    fun getBazaarVersionCode(context: Context): Long {
+        return getPackageInfo(context, BAZAAR_PACKAGE_NAME)?.longVersionCode ?: BAZAAR_ERROR_RESULT
+    }
 }
 
 internal fun getPackageInfo(context: Context, packageName: String): PackageInfo? = try {

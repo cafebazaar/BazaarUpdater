@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.farsitel.bazaar.updater.Security.getBazaarVersionCode
 import com.farsitel.bazaar.updater.Security.verifyBazaarIsInstalled
 import com.farsitel.bazaar.updater.VersionParser.parseUpdateResponse
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +19,7 @@ object BazaarUpdater {
 
     fun getLastUpdateState(
         context: Context,
-        scope: CoroutineScope? = null,
+        scope: CoroutineScope = retrieveScope(context),
         onResult: (UpdateResult) -> Unit
     ) {
         if (verifyBazaarIsInstalled(context).not()) {
@@ -27,10 +28,7 @@ object BazaarUpdater {
             initService(
                 context = context,
                 onResult = onResult,
-                scope = retrieveScope(
-                    context = context,
-                    scope = scope
-                )
+                scope = scope
             )
         }
     }
@@ -51,9 +49,7 @@ object BazaarUpdater {
     @OptIn(DelicateCoroutinesApi::class)
     private fun retrieveScope(
         context: Context,
-        scope: CoroutineScope?
     ): CoroutineScope {
-        if (scope != null) return scope
         return if (context is LifecycleOwner) {
             context.lifecycleScope
         } else {
@@ -70,6 +66,7 @@ object BazaarUpdater {
             UpdateServiceConnection(
                 packageName = context.packageName,
                 scope = scope,
+                bazaarVersionCode = getBazaarVersionCode(context),
                 onResult = { updateVersion ->
                     onResult(parseUpdateResponse(version = updateVersion, context = context))
                     releaseService(context)

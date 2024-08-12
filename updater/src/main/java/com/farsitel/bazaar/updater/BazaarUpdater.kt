@@ -15,7 +15,8 @@ import java.lang.ref.WeakReference
 
 object BazaarUpdater {
 
-    private var connection: WeakReference<UpdateServiceConnection>? = null
+    private var updateConnection: WeakReference<UpdateServiceConnection>? = null
+    private var autoUpdateConnection: WeakReference<AutoUpdateServiceConnection>? = null
 
     fun getLastUpdateState(
         context: Context,
@@ -25,7 +26,23 @@ object BazaarUpdater {
         if (verifyBazaarIsInstalled(context).not()) {
             onResult(UpdateResult.Error(BazaarIsNotInstalledException()))
         } else {
-            initService(
+            initUpdateService(
+                context = context,
+                onResult = onResult,
+                scope = scope
+            )
+        }
+    }
+
+    fun getAutoUpdateState(
+        context: Context,
+        scope: CoroutineScope = retrieveScope(context),
+        onResult: (AutoUpdateResult) -> Unit
+    ) {
+        if (verifyBazaarIsInstalled(context).not()) {
+            onResult(AutoUpdateResult.Error(BazaarIsNotInstalledException()))
+        } else {
+            initAutoUpdateService(
                 context = context,
                 onResult = onResult,
                 scope = scope
@@ -57,40 +74,75 @@ object BazaarUpdater {
         }
     }
 
-    private fun initService(
+    private fun initUpdateService(
         context: Context,
         scope: CoroutineScope,
         onResult: (UpdateResult) -> Unit
     ) {
-        connection = WeakReference(
+        updateConnection = WeakReference(
             UpdateServiceConnection(
                 packageName = context.packageName,
                 scope = scope,
                 bazaarVersionCode = getBazaarVersionCode(context),
                 onResult = { updateVersion ->
                     onResult(parseUpdateResponse(version = updateVersion, context = context))
-                    releaseService(context)
+                    releaseUpdateService(context)
                 },
                 onError = { message ->
                     onResult(UpdateResult.Error(message))
-                    releaseService(context)
+                    releaseUpdateService(context)
                 }
             ))
 
         val intent = Intent(BAZAAR_UPDATE_INTENT)
         intent.setPackage(BAZAAR_PACKAGE_NAME)
         try {
-            connection?.get()?.let { con ->
+            updateConnection?.get()?.let { con ->
                 context.bindService(intent, con, Context.BIND_AUTO_CREATE)
             }
         } catch (e: Exception) {
-            releaseService(context)
+            releaseUpdateService(context)
+        }
+    }
+
+    private fun initAutoUpdateService(
+        context: Context,
+        scope: CoroutineScope,
+        onResult: (AutoUpdateResult) -> Unit
+    ) {
+        autoUpdateConnection = WeakReference(
+            AutoUpdateServiceConnection(
+                packageName = context.packageName,
+                scope = scope,
+                onResult = { isEnable ->
+                    onResult(AutoUpdateResult.Success(isEnable))
+                    releaseAutoUpdateService(context)
+                },
+                onError = { message ->
+                    onResult(AutoUpdateResult.Error(message))
+                    releaseUpdateService(context)
+                }
+            ))
+
+        val intent = Intent(BAZAAR_AUTO_UPDATE_INTENT)
+        intent.setPackage(BAZAAR_PACKAGE_NAME)
+        try {
+            autoUpdateConnection?.get()?.let { con ->
+                context.bindService(intent, con, Context.BIND_AUTO_CREATE)
+            }
+        } catch (e: Exception) {
+            releaseAutoUpdateService(context)
         }
     }
 
     /** This is our function to un-binds this activity from our service.  */
-    private fun releaseService(context: Context) {
-        connection?.get()?.let { con -> context.unbindService(con) }
-        connection = null
+    private fun releaseUpdateService(context: Context) {
+        updateConnection?.get()?.let { con -> context.unbindService(con) }
+        updateConnection = null
+    }
+
+    private fun releaseAutoUpdateService(context: Context) {
+        autoUpdateConnection?.get()?.let { con -> context.unbindService(con) }
+        autoUpdateConnection = null
     }
 }

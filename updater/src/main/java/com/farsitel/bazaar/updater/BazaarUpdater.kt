@@ -55,7 +55,7 @@ object BazaarUpdater {
             return
         } else {
             val intent = Intent(
-                Intent.ACTION_VIEW, "$BAZAAR_THIRD_PARTY_APP_DETAIL${context.packageName}".toUri()
+                Intent.ACTION_VIEW, "$BAZAAR_THIRD_PARTY_AUTO_UPDATE${context.packageName}".toUri()
             ).apply {
                 setPackage(BAZAAR_PACKAGE_NAME)
             }

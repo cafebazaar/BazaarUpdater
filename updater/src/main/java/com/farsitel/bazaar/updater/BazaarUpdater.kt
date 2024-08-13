@@ -50,6 +50,19 @@ object BazaarUpdater {
         }
     }
 
+    fun enableAutoUpdate(context: Context) {
+        if (verifyBazaarIsInstalled(context).not()) {
+            return
+        } else {
+            val intent = Intent(
+                Intent.ACTION_VIEW, "$BAZAAR_THIRD_PARTY_APP_DETAIL${context.packageName}".toUri()
+            ).apply {
+                setPackage(BAZAAR_PACKAGE_NAME)
+            }
+            context.startActivity(intent)
+        }
+    }
+
     fun updateApplication(context: Context) {
         val intent = if (verifyBazaarIsInstalled(context).not()) {
             Intent(Intent.ACTION_VIEW, "$BAZAAR_WEB_APP_DETAIL${context.packageName}".toUri())

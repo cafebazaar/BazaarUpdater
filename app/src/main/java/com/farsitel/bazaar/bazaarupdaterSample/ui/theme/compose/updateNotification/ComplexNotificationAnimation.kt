@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -30,8 +31,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.farsitel.bazaar.bazaarupdaterSample.R
 import kotlinx.coroutines.delay
 
 @Composable
@@ -116,10 +119,9 @@ fun ComplexNotificationAnimation(
             contentAlignment = Alignment.Center
         ) {
             // Info icon in the middle of the circle
-            Icon(
-                imageVector = Icons.Filled.Info,
+            Image(
+                painter = painterResource(id = R.drawable.bazaar), // Use your drawable resource
                 contentDescription = "Info Icon",
-                tint = Color.White,
                 modifier = Modifier.size(24.dp) // Adjust size as needed
             )
         }

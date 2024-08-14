@@ -173,7 +173,10 @@ private fun NeedUpdateView(
     val context = LocalContext.current
 
 //    NotificationAnimation { checkUpdateState(context, onResult) }
-    ComplexNotificationAnimation({ checkUpdateState(context, onResult) })
+    ComplexNotificationAnimation(
+        { checkUpdateState(context, onResult) },
+        stringResource(R.string.there_is_new_update_version, targetVersion)
+    )
 //    ButtonFromRightEdge(
 //        context = LocalContext.current,
 //        text = stringResource(R.string.there_is_new_update_version, targetVersion),

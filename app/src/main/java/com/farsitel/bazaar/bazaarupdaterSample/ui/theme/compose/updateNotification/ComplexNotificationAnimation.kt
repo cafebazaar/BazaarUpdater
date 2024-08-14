@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -40,11 +41,12 @@ fun ComplexNotificationAnimation(
 ) {
     var showNotification by remember { mutableStateOf(false) }
     var isReturning by remember { mutableStateOf(false) }
+    var triggerAnimation by remember { mutableStateOf(0) } // Key to trigger animation restart
 
     // Trigger the notification animation
-    LaunchedEffect(Unit) {
+    LaunchedEffect(triggerAnimation) {
         showNotification = true
-        delay(2000) // Show for 2 seconds
+        delay(3_000) // Show for 2 seconds
         isReturning = true
         delay(1000)
         showNotification = false
@@ -57,23 +59,13 @@ fun ComplexNotificationAnimation(
         animationSpec = tween(durationMillis = 300)
     )
 
-    val offsetY by animateDpAsState(
-        targetValue = if (showNotification && !isReturning) 72.dp else 72.dp,
-        animationSpec = tween(durationMillis = 300)
-    )
-
     val circleOffsetX by animateDpAsState(
-        targetValue = if (showNotification && !isReturning) -60.dp else 0.dp,
+        targetValue = if (showNotification && !isReturning) -20.dp else 0.dp,
         animationSpec = tween(durationMillis = 300, delayMillis = 300)
     )
 
     val textBackgroundWidth by animateDpAsState(
-        targetValue = if (showNotification && !isReturning) 120.dp else 0.dp,
-        animationSpec = tween(durationMillis = 300, delayMillis = 300)
-    )
-
-    val textBackgroundOffsetX by animateDpAsState(
-        targetValue = if (showNotification && !isReturning) 0.dp else 0.dp,
+        targetValue = if (showNotification && !isReturning) 160.dp else 0.dp,
         animationSpec = tween(durationMillis = 300, delayMillis = 300)
     )
 
@@ -89,16 +81,37 @@ fun ComplexNotificationAnimation(
             .padding(top = 72.dp)
             .wrapContentSize(align = Alignment.TopCenter)
             .clickable {
-                showNotification = true // Restart the animation on click
+                // Trigger animation restart and invoke callback
+                triggerAnimation += 1 // Change the key to restart animation
+                showNotification = true
                 isReturning = false
                 onClickNotificationUpdater.invoke()
             }
     ) {
+        // Text background box
+        Box(
+            modifier = Modifier
+                .offset(x = circleOffsetX + circleSize / 2) // Ensure text background starts where circle is
+                .width(textBackgroundWidth)
+                .alpha(textBackgroundAlpha) // Fade the text background
+                .background(Color.White, shape = RoundedCornerShape(20.dp)) // Rounded corners
+                .padding(start = 40.dp, end = 8.dp) // Ensure padding to fit the circle
+                .height(40.dp), // Ensure the height matches the circle
+            contentAlignment = Alignment.CenterStart // Align text to start to avoid overlap
+        ) {
+            Text(
+                text = text,
+                color = Color.Black, // Black color for text
+                fontSize = 16.sp
+            )
+        }
+
+        // Circle box
         Box(
             modifier = Modifier
                 .offset(x = circleOffsetX)
                 .size(circleSize)
-                .background(Color(0xFF0E960E), shape = CircleShape) // Darker Green color
+                .background(Color(0xFF0E960E), shape = CircleShape) // Dark Green color
                 .animateContentSize(animationSpec = tween(durationMillis = 300)),
             contentAlignment = Alignment.Center
         ) {
@@ -109,24 +122,6 @@ fun ComplexNotificationAnimation(
                 tint = Color.White,
                 modifier = Modifier.size(24.dp) // Adjust size as needed
             )
-        }
-
-        if (circleSize > 0.dp) {
-            Box(
-                modifier = Modifier
-                    .offset(x = circleOffsetX + circleSize)
-                    .width(textBackgroundWidth)
-                    .alpha(textBackgroundAlpha) // Fade the text background
-                    .background(Color.White, shape = RoundedCornerShape(8.dp)) // Rounded corners
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = text,
-                    color = Color.Black, // Black color for text
-                    fontSize = 16.sp
-                )
-            }
         }
     }
 }

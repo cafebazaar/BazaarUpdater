@@ -55,7 +55,6 @@ fun WebViewScreen(onUrlMatched: (Boolean) -> Unit) {
                             super.doUpdateVisitedHistory(view, url, isReload)
                             val matched = url?.contains("https://app.snapp.taxi/pre-ride") == true
                             onUrlMatched(matched)
-
                         }
                     }
 

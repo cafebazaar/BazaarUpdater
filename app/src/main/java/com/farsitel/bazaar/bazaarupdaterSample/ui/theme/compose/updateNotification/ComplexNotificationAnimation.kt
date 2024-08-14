@@ -36,7 +36,6 @@ fun ComplexNotificationAnimation(
 ) {
     var showNotification by remember { mutableStateOf(false) }
     var isReturning by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()  // Use coroutine scope for better control
 
     // Trigger the notification animation
     LaunchedEffect(Unit) {
@@ -90,7 +89,7 @@ fun ComplexNotificationAnimation(
             modifier = Modifier
                 .offset(x = offsetX)
                 .size(circleSize)
-                .background(Color(0xFF7CFC00), shape = CircleShape)
+                .background(Color(0xFF006400), shape = CircleShape) // Darker Green color
                 .animateContentSize(animationSpec = tween(durationMillis = 300)),
             contentAlignment = Alignment.Center
         ) {}
@@ -106,7 +105,7 @@ fun ComplexNotificationAnimation(
             ) {
                 Text(
                     text = text,
-                    color = Color.Black,
+                    color = Color.Black, // Black color for text
                     fontSize = 16.sp
                 )
             }

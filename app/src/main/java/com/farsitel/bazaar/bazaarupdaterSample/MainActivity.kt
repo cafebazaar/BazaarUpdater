@@ -90,7 +90,10 @@ private fun UpdateScreen(
                     }
                 )
 
-                null -> CheckUpdateStateView(context = LocalContext.current, onResult = ::onResult)
+                null -> checkUpdateState(
+                    context = context,
+                    onResult = ::onResult
+                )
 
             }
         }

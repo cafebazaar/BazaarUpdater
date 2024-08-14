@@ -98,7 +98,7 @@ fun ComplexNotificationAnimation(
             modifier = Modifier
                 .offset(x = circleOffsetX)
                 .size(circleSize)
-                .background(Color(0xFF006400), shape = CircleShape) // Darker Green color
+                .background(Color(0xFF0E960E), shape = CircleShape) // Darker Green color
                 .animateContentSize(animationSpec = tween(durationMillis = 300)),
             contentAlignment = Alignment.Center
         ) {

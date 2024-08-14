@@ -10,6 +10,17 @@ activityCompose = "1.9.1"
 composeBom = "2024.06.00"
 appcompat = "1.7.0"
 material = "1.12.0"
+uiTooling = "1.6.8"
+ui = "1.7.0-beta07"
+materialVersion = "1.7.0-beta04"
+webkit = "1.12.0-alpha02"
+uiAndroid = "1.6.8"
+coil = "2.7.0"
+coilCompose = "2.7.0"
+activity = "1.9.1"
+activityKtx = "1.9.1"
+coilSvg = "2.7.0"
+lottieCompose = "6.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -28,6 +39,17 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
+ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
+androidx-material = { group = "androidx.compose.material", name = "material", version.ref = "materialVersion" }
+androidx-webkit = { group = "androidx.webkit", name = "webkit", version.ref = "webkit" }
+androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
+coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilCompose" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
+coil-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coilSvg" }
+lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottieCompose" }
 
 [plugins]
 maven-publish = { id = "maven-publish" }

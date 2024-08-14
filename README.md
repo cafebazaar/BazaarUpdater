@@ -37,7 +37,7 @@ repositories {
 
 ```kotlin
 dependencies {
-    implementation("com.github.hamid97m:bazaarUpdater:1.0.0-beta1")
+    implementation("com.github.hamid97m:bazaarUpdater:1.0.0")
 }
 ```
 
@@ -45,7 +45,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'com.github.hamid97m:bazaarUpdater:1.0.0-beta1'
+    implementation 'com.github.hamid97m:bazaarUpdater:1.0.0'
 }
 ```
 ## Usage

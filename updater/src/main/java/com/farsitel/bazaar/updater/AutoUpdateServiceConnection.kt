@@ -3,6 +3,7 @@ package com.farsitel.bazaar.updater
 import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.IBinder
+import android.util.Log
 import com.farsitel.bazaar.IAutoUpdateCheckService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,7 @@ internal class AutoUpdateServiceConnection(
         try {
             scope.launch(Dispatchers.IO) {
                 val isEnabled = service?.isAutoUpdateEnable(packageName)
+                Log.i("asdkjhasjkdbasjd", isEnabled.toString())
                 onResult(isEnabled ?: false)
             }
         } catch (t: Throwable) {

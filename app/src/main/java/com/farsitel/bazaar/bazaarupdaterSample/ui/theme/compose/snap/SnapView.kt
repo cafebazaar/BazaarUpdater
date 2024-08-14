@@ -20,7 +20,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.rememberAsyncImagePainter
 
 @Composable
-fun WebViewScreen(onUrlMatched: (Boolean) -> Unit) {
+fun WebViewScreen(
+    onUrlMatched: (Boolean) -> Unit,
+    onSettingUrlMatched: (Boolean) -> Unit,
+) {
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -54,7 +57,9 @@ fun WebViewScreen(onUrlMatched: (Boolean) -> Unit) {
                         ) {
                             super.doUpdateVisitedHistory(view, url, isReload)
                             val matched = url?.contains("https://app.snapp.taxi/pre-ride") == true
+                            val settingMatched = url?.contains("https://app.snapp.taxi/settings") == true
                             onUrlMatched(matched)
+                            onSettingUrlMatched(settingMatched)
                         }
                     }
 
@@ -84,5 +89,5 @@ fun WebViewScreen(onUrlMatched: (Boolean) -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun WebViewScreenPreview() {
-    WebViewScreen({})
+    WebViewScreen({},{})
 }

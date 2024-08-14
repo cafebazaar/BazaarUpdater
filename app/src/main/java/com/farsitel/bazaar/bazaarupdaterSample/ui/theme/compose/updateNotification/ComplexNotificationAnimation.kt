@@ -31,7 +31,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.farsitel.bazaar.bazaarupdaterSample.R
@@ -105,7 +107,7 @@ fun ComplexNotificationAnimation(
             Text(
                 text = text,
                 color = Color.Black, // Black color for text
-                fontSize = 16.sp
+                fontSize = 12.sp
             )
         }
 
@@ -119,9 +121,10 @@ fun ComplexNotificationAnimation(
             contentAlignment = Alignment.Center
         ) {
             // Info icon in the middle of the circle
-            Image(
-                painter = painterResource(id = R.drawable.bazaar), // Use your drawable resource
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.bazaar),
                 contentDescription = "Info Icon",
+                tint = Color.White,
                 modifier = Modifier.size(24.dp) // Adjust size as needed
             )
         }

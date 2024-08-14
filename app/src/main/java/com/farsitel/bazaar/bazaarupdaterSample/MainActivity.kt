@@ -111,15 +111,11 @@ private fun UpdateScreen(
             autoUpdateState.value is AutoUpdateResult.Success &&
             (autoUpdateState.value as AutoUpdateResult.Success).isEnable.not()
         ) {
-            Button(
-                shape = CircleShape,
-                modifier = modifier,
-                onClick = {
-                    BazaarUpdater.enableAutoUpdate(context)
-                }
-            ) {
-                Text(text = "AutoUpdate")
-            }
+
+            ComplexNotificationAnimation(
+                {  BazaarUpdater.enableAutoUpdate(context) },
+                "بروزرسانی خودکار"
+            )
         }
 
         if (showButton.value) {
@@ -172,17 +168,10 @@ private fun NeedUpdateView(
 ) {
     val context = LocalContext.current
 
-//    NotificationAnimation { checkUpdateState(context, onResult) }
     ComplexNotificationAnimation(
         { checkUpdateState(context, onResult) },
         stringResource(R.string.there_is_new_update_version, targetVersion)
     )
-//    ButtonFromRightEdge(
-//        context = LocalContext.current,
-//        text = stringResource(R.string.there_is_new_update_version, targetVersion),
-//        modifier = modifier,
-//        onResult = onResult,
-//    )
 }
 
 @Composable

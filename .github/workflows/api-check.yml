@@ -2,10 +2,11 @@ name: Api Check
 
 on:
   push:
-    branches: [ main ]
+    branches: [ cafebazaar:master, master ]
   pull_request:
     branches:
-      - main
+      - cafebazaar:master
+      - master
     types:
       - opened
       - synchronize

@@ -13,11 +13,11 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import java.lang.ref.WeakReference
 
-object BazaarUpdater {
+public object BazaarUpdater {
 
     private var connection: WeakReference<UpdateServiceConnection>? = null
 
-    fun getLastUpdateState(
+    public fun getLastUpdateState(
         context: Context,
         scope: CoroutineScope = retrieveScope(context),
         onResult: (UpdateResult) -> Unit
@@ -33,7 +33,7 @@ object BazaarUpdater {
         }
     }
 
-    fun updateApplication(context: Context) {
+    public fun updateApplication(context: Context) {
         val intent = if (verifyBazaarIsInstalled(context).not()) {
             Intent(Intent.ACTION_VIEW, "$BAZAAR_WEB_APP_DETAIL${context.packageName}".toUri())
         } else {

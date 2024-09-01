@@ -1,4 +1,4 @@
-name: Api Check
+name: Api Binary Check
 
 on:
   push:

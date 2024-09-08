@@ -80,10 +80,10 @@ public object BazaarUpdater {
                 packageName = context.packageName,
                 scope = scope,
                 bazaarVersionCode = getBazaarVersionCode(context),
-                onResult = { updateVersion ->
+                onResult = { targetVersion ->
                     listener.onResult(
                         parseUpdateResponse(
-                            version = updateVersion,
+                            version = targetVersion,
                             context = context,
                         ),
                     )

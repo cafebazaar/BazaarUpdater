@@ -8,8 +8,7 @@ import android.content.pm.PackageInfo
 import androidx.core.content.pm.PackageInfoCompat
 
 internal fun getPackageInfo(context: Context, packageName: String): PackageInfo? = try {
-    val packageManager = context.packageManager
-    packageManager.getPackageInfo(packageName, 0)
+    context.packageManager.getPackageInfo(packageName, 0)
 } catch (ignored: Exception) {
     null
 }

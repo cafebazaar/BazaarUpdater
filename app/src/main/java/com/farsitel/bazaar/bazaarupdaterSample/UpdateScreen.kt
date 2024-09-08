@@ -1,7 +1,6 @@
 package com.farsitel.bazaar.bazaarupdaterSample
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -25,7 +24,7 @@ fun UpdateScreen(
 ) {
     Box(
         modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         when (val state = updateState.value) {
             UpdateResult.AlreadyUpdated -> {
@@ -66,12 +65,10 @@ private fun ErrorView(
     message: String,
     modifier: Modifier = Modifier,
 ) {
-    Column {
-        Text(
-            modifier = modifier,
-            text = message,
-        )
-    }
+    Text(
+        modifier = modifier,
+        text = message,
+    )
 }
 
 @Composable

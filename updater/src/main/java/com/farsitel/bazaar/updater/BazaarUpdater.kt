@@ -15,23 +15,6 @@ public object BazaarUpdater {
 
     private var connection: WeakReference<UpdateServiceConnection>? = null
 
-    @JvmSynthetic
-    public fun getLastUpdateState(
-        context: Context,
-        scope: CoroutineScope = retrieveScope(context),
-        onResult: (UpdateResult) -> Unit,
-    ) {
-        if (verifyBazaarIsInstalled(context).not()) {
-            onResult(UpdateResult.Error(BazaarIsNotInstalledException()))
-        } else {
-            initService(
-                context = context,
-                onResult = onResult,
-                scope = scope,
-            )
-        }
-    }
-
     @JvmStatic
     public fun getLastUpdateState(
         context: Context,
@@ -39,8 +22,26 @@ public object BazaarUpdater {
     ) {
         getLastUpdateState(
             context = context,
-            onResult = { listener.onResult(it) },
+            scope = retrieveScope(context),
+            listener = listener,
         )
+    }
+
+    @JvmSynthetic
+    public fun getLastUpdateState(
+        context: Context,
+        scope: CoroutineScope,
+        listener: OnUpdateResult,
+    ) {
+        if (verifyBazaarIsInstalled(context).not()) {
+            listener.onResult(UpdateResult.Error(BazaarIsNotInstalledException()))
+        } else {
+            initService(
+                context = context,
+                scope = scope,
+                listener = listener,
+            )
+        }
     }
 
     @JvmStatic
@@ -72,7 +73,7 @@ public object BazaarUpdater {
     private fun initService(
         context: Context,
         scope: CoroutineScope,
-        onResult: (UpdateResult) -> Unit,
+        listener: OnUpdateResult,
     ) {
         connection = WeakReference(
             UpdateServiceConnection(
@@ -80,11 +81,16 @@ public object BazaarUpdater {
                 scope = scope,
                 bazaarVersionCode = getBazaarVersionCode(context),
                 onResult = { updateVersion ->
-                    onResult(parseUpdateResponse(version = updateVersion, context = context))
+                    listener.onResult(
+                        parseUpdateResponse(
+                            version = updateVersion,
+                            context = context,
+                        ),
+                    )
                     releaseService(context)
                 },
                 onError = { message ->
-                    onResult(UpdateResult.Error(message))
+                    listener.onResult(UpdateResult.Error(message))
                     releaseService(context)
                 },
             ),

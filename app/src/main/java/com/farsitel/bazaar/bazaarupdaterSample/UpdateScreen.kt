@@ -37,7 +37,7 @@ fun UpdateScreen(
             }
             is UpdateResult.NeedUpdate -> {
                 NeedUpdateView(
-                    targetVersion = state.targetVersion,
+                    targetVersion = state.getTargetVersionCode(),
                     onClick = onUpdateClick,
                 )
             }

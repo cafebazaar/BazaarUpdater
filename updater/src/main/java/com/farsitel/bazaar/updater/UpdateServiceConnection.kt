@@ -16,11 +16,9 @@ internal class UpdateServiceConnection(
     private val onError: ((Throwable) -> Unit),
 ) : ServiceConnection {
 
-    private var service: IUpdateCheckService? = null
-
     override fun onServiceConnected(name: ComponentName?, boundService: IBinder?) {
-        service = IUpdateCheckService.Stub.asInterface(boundService)
         try {
+            val service = IUpdateCheckService.Stub.asInterface(boundService)
             scope.launch(Dispatchers.IO) {
                 val versionCode = if (bazaarVersionCode >= BAZAAR_CODE_REMOTE_VERSION_SUPPORTED) {
                     service?.getRemoteVersionCode(packageName)

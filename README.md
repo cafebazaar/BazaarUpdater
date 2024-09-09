@@ -71,8 +71,24 @@ BazaarUpdater.getLastUpdateState(context = context) { result ->
         }
     }
 }
-
 ```
+
+<details><summary><b>Java Usage</b></summary>
+
+```java
+BazaarUpdater.getLastUpdateState(context, result -> {
+    if (result.isAlreadyUpdated()) {
+        // Handle the case where the app is already updated
+    } else if (result.isUpdateNeeded()) {
+        // Handle the case where an update is needed
+        long targetVersion = result.getTargetVersion();
+    } else {
+        // Handle the error case
+        String errorMessage = result.getError().getMessage();
+    }
+});
+```
+</details>
 
 #### Update Result States
 

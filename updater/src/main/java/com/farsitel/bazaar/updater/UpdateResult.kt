@@ -3,7 +3,11 @@
 package com.farsitel.bazaar.updater
 
 public sealed class UpdateResult {
-    public data class NeedUpdate(val targetVersion: Long) : UpdateResult()
+    public data class NeedUpdate(
+        @JvmSynthetic
+        internal val targetVersion: Long
+    ) : UpdateResult()
+
     public object AlreadyUpdated : UpdateResult()
     public data class Error(val throwable: Throwable) : UpdateResult()
 
@@ -15,7 +19,7 @@ public sealed class UpdateResult {
         return this is NeedUpdate
     }
 
-    public fun getTargetVersion(): Long {
+    public fun getTargetVersionCode(): Long {
         return (this as? NeedUpdate)?.targetVersion ?: BAZAAR_ERROR_RESULT
     }
 
@@ -25,7 +29,7 @@ public sealed class UpdateResult {
 }
 
 public inline fun UpdateResult.doOnUpdateNeeded(call: (Long) -> Unit): UpdateResult {
-    if (isUpdateNeeded()) call(getTargetVersion())
+    if (isUpdateNeeded()) call(getTargetVersionCode())
     return this
 }
 

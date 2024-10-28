@@ -1,7 +1,7 @@
 # BazaarUpdater Android SDK
 
 <p align="center">
-<img src="./images/sample.gif" alt="gif" width="150 ">
+<img src="./images/sample.gif" alt="gif" width="250">
 </p>
 
 [![GitHub License](https://img.shields.io/github/license/cafebazaar/BazaarPay)](https://www.apache.org/licenses/LICENSE-2.0)
@@ -109,8 +109,17 @@ BazaarUpdater.updateApplication(context = context)
 ## Contributing
 Contributions are welcome! If you have suggestions or improvements, please open an issue or submit a pull request
 
+
+
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+<br/>
+<br/>
+
+<p align="center">
+Made with 💚 in Bazaar Hackathon 1403
+</p>
 
 

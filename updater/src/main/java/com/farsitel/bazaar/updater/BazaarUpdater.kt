@@ -54,6 +54,7 @@ public object BazaarUpdater {
                 "$BAZAAR_THIRD_PARTY_APP_DETAIL${context.packageName}".toUri(),
             ).apply {
                 setPackage(BAZAAR_PACKAGE_NAME)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
         }
         context.startActivity(intent)

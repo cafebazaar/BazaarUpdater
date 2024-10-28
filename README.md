@@ -5,7 +5,7 @@
 </p>
 
 [![GitHub License](https://img.shields.io/github/license/cafebazaar/BazaarPay)](https://www.apache.org/licenses/LICENSE-2.0)
-[![Download](https://jitpack.io/v/hamid97m/BazaarUpdater.svg)](https://jitpack.io/#hamid97m/BazaarUpdater)
+[![Download](https://jitpack.io/v/cafebazaar/BazaarUpdater.svg)](https://jitpack.io/#cafebazaar/BazaarUpdater)
 
 
 BazaarUpdater is an Android library that simplifies checking for updates and managing the update process for your application on Bazaar.
@@ -37,7 +37,7 @@ repositories {
 
 ```kotlin
 dependencies {
-    implementation("com.github.hamid97m:bazaarUpdater:1.0.0-beta1")
+    implementation("com.github.cafebazaar:bazaarUpdater:1.0.0-beta2")
 }
 ```
 
@@ -45,7 +45,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'com.github.hamid97m:bazaarUpdater:1.0.0-beta1'
+    implementation 'com.github.cafebazaar:bazaarUpdater:1.0.0-beta2'
 }
 ```
 ## Usage

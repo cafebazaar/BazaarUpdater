@@ -1,0 +1,82 @@
+public abstract interface class com/farsitel/bazaar/IUpdateCheckService : android/os/IInterface {
+	public static final field DESCRIPTOR Ljava/lang/String;
+	public abstract fun getRemoteVersionCode (Ljava/lang/String;)J
+	public abstract fun getVersionCode (Ljava/lang/String;)J
+}
+
+public class com/farsitel/bazaar/IUpdateCheckService$Default : com/farsitel/bazaar/IUpdateCheckService {
+	public fun <init> ()V
+	public fun asBinder ()Landroid/os/IBinder;
+	public fun getRemoteVersionCode (Ljava/lang/String;)J
+	public fun getVersionCode (Ljava/lang/String;)J
+}
+
+public abstract class com/farsitel/bazaar/IUpdateCheckService$Stub : android/os/Binder, com/farsitel/bazaar/IUpdateCheckService {
+	public fun <init> ()V
+	public fun asBinder ()Landroid/os/IBinder;
+	public static fun asInterface (Landroid/os/IBinder;)Lcom/farsitel/bazaar/IUpdateCheckService;
+	public fun onTransact (ILandroid/os/Parcel;Landroid/os/Parcel;I)Z
+}
+
+public final class com/farsitel/bazaar/updater/-UpdateResult {
+	public static final fun doOnAlreadyUpdated (Lcom/farsitel/bazaar/updater/UpdateResult;Lkotlin/jvm/functions/Function0;)Lcom/farsitel/bazaar/updater/UpdateResult;
+	public static final fun doOnError (Lcom/farsitel/bazaar/updater/UpdateResult;Lkotlin/jvm/functions/Function1;)Lcom/farsitel/bazaar/updater/UpdateResult;
+	public static final fun doOnUpdateNeeded (Lcom/farsitel/bazaar/updater/UpdateResult;Lkotlin/jvm/functions/Function1;)Lcom/farsitel/bazaar/updater/UpdateResult;
+}
+
+public final class com/farsitel/bazaar/updater/BazaarIsNotInstalledException : java/lang/RuntimeException {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getMessage ()Ljava/lang/String;
+}
+
+public final class com/farsitel/bazaar/updater/BazaarUpdater {
+	public static final field INSTANCE Lcom/farsitel/bazaar/updater/BazaarUpdater;
+	public static final fun getLastUpdateState (Landroid/content/Context;Lcom/farsitel/bazaar/updater/OnUpdateResult;)V
+	public final synthetic fun getLastUpdateState (Landroid/content/Context;Lkotlinx/coroutines/CoroutineScope;Lcom/farsitel/bazaar/updater/OnUpdateResult;)V
+	public static final fun updateApplication (Landroid/content/Context;)V
+}
+
+public abstract interface class com/farsitel/bazaar/updater/OnUpdateResult {
+	public abstract fun onResult (Lcom/farsitel/bazaar/updater/UpdateResult;)V
+}
+
+public final class com/farsitel/bazaar/updater/UnknownException : java/lang/RuntimeException {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getMessage ()Ljava/lang/String;
+}
+
+public abstract class com/farsitel/bazaar/updater/UpdateResult {
+	public final fun getError ()Ljava/lang/Throwable;
+	public final fun getTargetVersionCode ()J
+	public final fun isAlreadyUpdated ()Z
+	public final fun isUpdateNeeded ()Z
+}
+
+public final class com/farsitel/bazaar/updater/UpdateResult$AlreadyUpdated : com/farsitel/bazaar/updater/UpdateResult {
+	public static final field INSTANCE Lcom/farsitel/bazaar/updater/UpdateResult$AlreadyUpdated;
+}
+
+public final class com/farsitel/bazaar/updater/UpdateResult$Error : com/farsitel/bazaar/updater/UpdateResult {
+	public fun <init> (Ljava/lang/Throwable;)V
+	public final fun component1 ()Ljava/lang/Throwable;
+	public final fun copy (Ljava/lang/Throwable;)Lcom/farsitel/bazaar/updater/UpdateResult$Error;
+	public static synthetic fun copy$default (Lcom/farsitel/bazaar/updater/UpdateResult$Error;Ljava/lang/Throwable;ILjava/lang/Object;)Lcom/farsitel/bazaar/updater/UpdateResult$Error;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getThrowable ()Ljava/lang/Throwable;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/farsitel/bazaar/updater/UpdateResult$NeedUpdate : com/farsitel/bazaar/updater/UpdateResult {
+	public fun <init> (J)V
+	public final fun copy (J)Lcom/farsitel/bazaar/updater/UpdateResult$NeedUpdate;
+	public static synthetic fun copy$default (Lcom/farsitel/bazaar/updater/UpdateResult$NeedUpdate;JILjava/lang/Object;)Lcom/farsitel/bazaar/updater/UpdateResult$NeedUpdate;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+

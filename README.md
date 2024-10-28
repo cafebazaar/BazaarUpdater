@@ -63,16 +63,32 @@ BazaarUpdater.getLastUpdateState(context = context) { result ->
         }
         is UpdateResult.Error -> {
             // Handle the error case
-            val errorMessage = result.message
+            val errorMessage = result.getError()?.message
         }
         is UpdateResult.NeedUpdate -> {
             // Handle the case where an update is needed
-            val targetVersion = result.targetVersion
+            val targetVersion = result.getTargetVersionCode()
         }
     }
 }
-
 ```
+
+<details><summary><b>Java Usage</b></summary>
+
+```java
+BazaarUpdater.getLastUpdateState(context, result -> {
+    if (result.isAlreadyUpdated()) {
+        // Handle the case where the app is already updated
+    } else if (result.isUpdateNeeded()) {
+        // Handle the case where an update is needed
+        long targetVersion = result.getTargetVersionCode();
+    } else {
+        // Handle the error case
+        String errorMessage = result.getError().getMessage();
+    }
+});
+```
+</details>
 
 #### Update Result States
 
@@ -80,7 +96,7 @@ BazaarUpdater.getLastUpdateState(context = context) { result ->
 
 ##### 2. Error: Indicates an error occurred. Use `result.message` to get the error message.
 
-##### 3. NeedUpdate: Indicates that a new update is available. Use `result.targetVersion` to get the version code of the update.
+##### 3. NeedUpdate: Indicates that a new update is available. Use `result.getTargetVersionCode()` to get the version code of the update.
 
 ### Updating the Application
 

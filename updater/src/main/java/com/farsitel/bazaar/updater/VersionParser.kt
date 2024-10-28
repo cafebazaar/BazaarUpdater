@@ -1,10 +1,10 @@
 package com.farsitel.bazaar.updater
 
 import android.content.Context
-import androidx.core.content.pm.PackageInfoCompat
 
 internal object VersionParser {
 
+    @JvmSynthetic
     fun parseUpdateResponse(version: Long, context: Context): UpdateResult {
         return when {
             version == BAZAAR_ERROR_RESULT -> UpdateResult.Error(UnknownException())
@@ -14,8 +14,7 @@ internal object VersionParser {
     }
 
     private fun isUpdated(updatedVersion: Long, context: Context): Boolean {
-        val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        val currentVersion = PackageInfoCompat.getLongVersionCode(packageInfo)
+        val currentVersion = requireNotNull(getPackageVersionCode(context, context.packageName))
         return currentVersion >= updatedVersion
     }
 }

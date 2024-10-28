@@ -5,40 +5,53 @@ import android.content.Intent
 import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.farsitel.bazaar.updater.Security.getBazaarVersionCode
-import com.farsitel.bazaar.updater.Security.verifyBazaarIsInstalled
 import com.farsitel.bazaar.updater.VersionParser.parseUpdateResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import java.lang.ref.WeakReference
 
-object BazaarUpdater {
+public object BazaarUpdater {
 
     private var connection: WeakReference<UpdateServiceConnection>? = null
 
-    fun getLastUpdateState(
+    @JvmStatic
+    public fun getLastUpdateState(
         context: Context,
-        scope: CoroutineScope = retrieveScope(context),
-        onResult: (UpdateResult) -> Unit
+        listener: OnUpdateResult,
+    ) {
+        getLastUpdateState(
+            context = context,
+            scope = retrieveScope(context),
+            listener = listener,
+        )
+    }
+
+    @JvmSynthetic
+    public fun getLastUpdateState(
+        context: Context,
+        scope: CoroutineScope,
+        listener: OnUpdateResult,
     ) {
         if (verifyBazaarIsInstalled(context).not()) {
-            onResult(UpdateResult.Error(BazaarIsNotInstalledException()))
+            listener.onResult(UpdateResult.Error(BazaarIsNotInstalledException()))
         } else {
             initService(
                 context = context,
-                onResult = onResult,
-                scope = scope
+                scope = scope,
+                listener = listener,
             )
         }
     }
 
-    fun updateApplication(context: Context) {
+    @JvmStatic
+    public fun updateApplication(context: Context) {
         val intent = if (verifyBazaarIsInstalled(context).not()) {
             Intent(Intent.ACTION_VIEW, "$BAZAAR_WEB_APP_DETAIL${context.packageName}".toUri())
         } else {
             Intent(
-                Intent.ACTION_VIEW, "$BAZAAR_THIRD_PARTY_APP_DETAIL${context.packageName}".toUri()
+                Intent.ACTION_VIEW,
+                "$BAZAAR_THIRD_PARTY_APP_DETAIL${context.packageName}".toUri(),
             ).apply {
                 setPackage(BAZAAR_PACKAGE_NAME)
             }
@@ -60,22 +73,28 @@ object BazaarUpdater {
     private fun initService(
         context: Context,
         scope: CoroutineScope,
-        onResult: (UpdateResult) -> Unit
+        listener: OnUpdateResult,
     ) {
         connection = WeakReference(
             UpdateServiceConnection(
                 packageName = context.packageName,
                 scope = scope,
                 bazaarVersionCode = getBazaarVersionCode(context),
-                onResult = { updateVersion ->
-                    onResult(parseUpdateResponse(version = updateVersion, context = context))
+                onResult = { targetVersion ->
+                    listener.onResult(
+                        parseUpdateResponse(
+                            version = targetVersion,
+                            context = context,
+                        ),
+                    )
                     releaseService(context)
                 },
                 onError = { message ->
-                    onResult(UpdateResult.Error(message))
+                    listener.onResult(UpdateResult.Error(message))
                     releaseService(context)
-                }
-            ))
+                },
+            ),
+        )
 
         val intent = Intent(BAZAAR_UPDATE_INTENT)
         intent.setPackage(BAZAAR_PACKAGE_NAME)

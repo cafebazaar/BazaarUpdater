@@ -6,4 +6,4 @@ internal const val BAZAAR_THIRD_PARTY_APP_DETAIL = "bazaar://details/modal?id="
 internal const val BAZAAR_WEB_APP_DETAIL = "https://cafebazaar.ir/app/?id="
 internal const val BAZAAR_ERROR_RESULT = -1L
 
-internal const val BAZAAR_CODE_REMOTE_VERSION_SUPPORTED = 2400600
+internal const val BAZAAR_CODE_REMOTE_VERSION_SUPPORTED = 2400700

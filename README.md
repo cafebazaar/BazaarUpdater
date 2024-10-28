@@ -106,7 +106,7 @@ To update your application when a new version is available on Bazaar, simply cal
 BazaarUpdater.updateApplication(context = context)
 ```
 
-## Coming soon
+## Coming soon 🔥
 <p align="center">
 <img src="./images/auto_update.png"  width="150 ">
 </p>

@@ -1,6 +1,7 @@
 package com.farsitel.bazaar.bazaarupdaterSample
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -13,39 +14,76 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.farsitel.bazaar.bazaarupdaterSample.ui.theme.BazaarUpdaterSampleTheme
+import com.farsitel.bazaar.updater.AutoUpdateResult
 import com.farsitel.bazaar.updater.UpdateResult
 
 @Composable
 fun UpdateScreen(
-    updateState: State<UpdateResult?>,
+    updateState: State<UpdateState?>,
     modifier: Modifier = Modifier,
     onUpdateClick: () -> Unit = {},
     onCheckVersionClick: () -> Unit = {},
+    onAutoUpdateClick: () -> Unit = {},
 ) {
-    Box(
+    Column(
         modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        when (val state = updateState.value) {
+        when (val state = updateState.value?.updateResult) {
             UpdateResult.AlreadyUpdated -> {
                 AlreadyUpdatedView()
             }
+
             is UpdateResult.Error -> {
                 ErrorView(
                     message = state.throwable.message.orEmpty(),
                 )
             }
+
             is UpdateResult.NeedUpdate -> {
                 NeedUpdateView(
                     targetVersion = state.getTargetVersionCode(),
                     onClick = onUpdateClick,
                 )
             }
+
             else -> {
                 CheckUpdateStateView(
                     onClick = onCheckVersionClick,
                 )
             }
+        }
+
+        when (val state = updateState.value?.autoUpdateResult) {
+            is AutoUpdateResult.Error -> ErrorView(
+                message = state.throwable.message.orEmpty(),
+            )
+
+            is AutoUpdateResult.Result -> AutoUpdate(
+                result = state,
+                onAutoUpdateClick = onAutoUpdateClick
+            )
+
+            null -> {}
+        }
+    }
+}
+
+@Composable
+fun AutoUpdate(
+    result: AutoUpdateResult,
+    modifier: Modifier = Modifier,
+    onAutoUpdateClick: () -> Unit = {},
+) {
+    if (result.isEnable()) {
+        Text(
+            modifier = modifier,
+            text = stringResource(R.string.auto_update_enable_description),
+        )
+    } else {
+        UpdateButton(text = "Enable Autoupdate") {
+            onAutoUpdateClick()
         }
     }
 }
@@ -117,7 +155,7 @@ private fun UpdateScreenPreview() {
         UpdateScreen(
             updateState = remember {
                 mutableStateOf(null)
-            },
+            }
         )
     }
 }

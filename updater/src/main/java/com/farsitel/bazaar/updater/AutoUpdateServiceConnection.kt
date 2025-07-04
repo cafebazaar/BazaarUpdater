@@ -20,7 +20,7 @@ internal class AutoUpdateServiceConnection(
         try {
             val service = IAutoUpdateCheckService.Stub.asInterface(boundService)
             scope.launch(Dispatchers.IO) {
-                val isAutoUpdateEnabled = if (bazaarVersionCode > BAZAAR_CODE_AUTO_UPDATE_SUPPORTED) {
+                val isAutoUpdateEnabled = if (bazaarVersionCode >= BAZAAR_CODE_AUTO_UPDATE_SUPPORTED) {
                     service?.isAutoUpdateEnabled(packageName)
                 } else {
                     null

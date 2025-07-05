@@ -105,15 +105,57 @@ To update your application when a new version is available on Bazaar, simply cal
 ```kotlin
 BazaarUpdater.updateApplication(context = context)
 ```
+## Auto Update
 
-## Coming soon 🔥
-<p align="center">
-<img src="./images/auto_update.png"  width="150 ">
-</p>
+This feature allows you to enable automatic updates for your apps in Bazaar. Once enabled, Bazaar will check for application updates daily. If an update is available and Bazaar is the update owner of your app, it will automatically download and install the update.
+
+> ⚠️ Note: This feature requires Bazaar version 26.2.0 or higher.
+
+### Checking for Auto Update
+
+To check whether Auto Update is enabled for your application in Bazaar, use the following code:
+
+```kotlin
+BazaarAutoUpdater.getLastAutoUpdateState(context = this) { result ->
+    when (result) {
+        is AutoUpdateResult.Error -> {
+            // Handle the error case
+            val errorMessage = result.getError()?.message
+        }
+        is AutoUpdateResult.Result -> {
+            val isEnabled = result.isEnable()
+        }
+    }
+}
+```
+
+<details>
+<summary><strong>Java Usage</strong></summary>
+
+```java
+BazaarAutoUpdater.getLastAutoUpdateState(context, result -> {
+    if (result.getError() != null) {
+        // Handle the error case
+        String errorMessage = result.getError().getMessage();
+    } else {
+        Boolean isEnabled = result.isEnable();
+    }
+});
+```
+
+</details>
+
+### Enable Auto Update
+
+To enable Auto Update for your application, simply call the following method:
+
+```kotlin
+BazaarAutoUpdater.enableAutoUpdate(context = context)
+```
 
 ## Contributing
-Contributions are welcome! If you have suggestions or improvements, please open an issue or submit a pull request
 
+Contributions are welcome! If you have suggestions or improvements, please open an issue or submit a pull request.
 
 
 ## License

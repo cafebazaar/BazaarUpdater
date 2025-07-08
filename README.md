@@ -1,7 +1,7 @@
 # BazaarUpdater Android SDK
 
 <p align="center">
-<img src="./images/sample.gif" alt="gif" width="250">
+<img src="./images/dark.png" alt="gif" width="700">
 </p>
 
 [![GitHub License](https://img.shields.io/github/license/cafebazaar/BazaarPay)](https://www.apache.org/licenses/LICENSE-2.0)
@@ -37,7 +37,7 @@ repositories {
 
 ```kotlin
 dependencies {
-    implementation("com.github.cafebazaar:bazaarUpdater:1.0.0-beta3")
+    implementation("com.github.cafebazaar:bazaarUpdater:1.1.0")
 }
 ```
 
@@ -45,7 +45,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'com.github.cafebazaar:bazaarUpdater:1.0.0-beta3'
+    implementation 'com.github.cafebazaar:bazaarUpdater:1.1.0'
 }
 ```
 ## Usage

@@ -111,6 +111,10 @@ This feature allows you to enable automatic updates for your apps in Bazaar. Onc
 
 > ⚠️ Note: This feature requires Bazaar version 26.2.0 or higher.
 
+> ⚠️ Package Name : Ensure the package name (also known as the application ID in Android) in your source code exactly matches the one used in the already published app. This is typically defined in your app's AndroidManifest.xml file.
+
+> ⚠️ Signature : The app must be signed with the same key as the published version. Make sure you’re using the correct keystore and alias that were used for the original app.
+
 ### Checking for Auto Update
 
 To check whether Auto Update is enabled for your application in Bazaar, use the following code:

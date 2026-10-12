@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         checkAutoUpdateState()
-        checkUpdateDownloaded()
+        checkNewVersionState()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,9 +57,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun checkUpdateDownloaded() {
-        BazaarUpdater.isUpdateDownloaded(context = this) { result ->
-            updateState.value = updateState.value.copy(updateDownloadedResult = result)
+    private fun checkNewVersionState() {
+        BazaarUpdater.getNewVersionState(context = this) { result ->
+            updateState.value = updateState.value.copy(newVersionStateResult = result)
         }
     }
 

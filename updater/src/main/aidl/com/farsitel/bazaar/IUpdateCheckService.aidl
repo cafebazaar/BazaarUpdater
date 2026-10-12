@@ -4,15 +4,18 @@ interface IUpdateCheckService {
     long getRemoteVersionCode(String packageName);
 
     /**
-     * True when Bazaar holds a completed download for [packageName] whose version is
-     * newer than the one installed on the device, so the update was downloaded but
-     * never installed. Only the app that owns the package can ask about it: the caller
-     * is identified by the uid behind the package name it passes.
+     * Which of the three update situations [packageName] is in:
+     *   0 - no new version: the installed version is the newest one Bazaar knows;
+     *   1 - new version available: Bazaar knows a newer version that is not downloaded;
+     *   2 - new version downloaded: a newer version is downloaded and only its install
+     *       is left.
+     * Only the app that owns the package can ask about it: the caller is identified by
+     * the uid behind the package name it passes, and anything else answers 0.
      *
-     * The caller finishes that download through Bazaar's own app page, which already
-     * installs a ready download when the user taps install there.
+     * When it answers 2, the caller finishes that download through Bazaar's own app
+     * page, which already installs a ready download when the user taps install there.
      */
-    boolean isUpdateDownloaded(String packageName);
+    int getNewVersionState(String packageName);
 
     /**
      * Fetches the install metadata of the update Bazaar already downloaded for

@@ -111,18 +111,18 @@ public class BazaarUpdaterTest {
     }
 
     @Test
-    public fun `successful downloaded check reports the result on the main thread`() {
-        val context = BazaarContext(updateDownloaded = true)
-        val results = mutableListOf<UpdateDownloadedResult>()
+    public fun `each state Bazaar reports arrives on the main thread`() {
+        val context = BazaarContext(state = NewVersionState.NEW_VERSION_DOWNLOADED)
+        val results = mutableListOf<NewVersionStateResult>()
         var callbackOnMainThread = false
 
-        BazaarUpdater.isUpdateDownloaded(context) { result ->
+        BazaarUpdater.getNewVersionState(context) { result ->
             callbackOnMainThread = Looper.myLooper() == Looper.getMainLooper()
             results += result
         }
         awaitResult(results)
 
-        assertTrue(results.single().isDownloaded())
+        assertEquals(NewVersionState.NEW_VERSION_DOWNLOADED, results.single().getState())
         assertTrue(callbackOnMainThread)
         assertEquals(1, context.bindCount)
         assertEquals(1, context.unbindCount)
@@ -130,23 +130,46 @@ public class BazaarUpdaterTest {
     }
 
     @Test
-    public fun `not downloaded check reports a false result`() {
-        val context = BazaarContext(updateDownloaded = false)
-        val results = mutableListOf<UpdateDownloadedResult>()
+    public fun `a new version that is only known arrives as available`() {
+        val context = BazaarContext(state = NewVersionState.NEW_VERSION_AVAILABLE)
+        val results = mutableListOf<NewVersionStateResult>()
 
-        BazaarUpdater.isUpdateDownloaded(context, results::add)
+        BazaarUpdater.getNewVersionState(context, results::add)
         awaitResult(results)
 
-        assertFalse(results.single().isDownloaded())
+        assertEquals(NewVersionState.NEW_VERSION_AVAILABLE, results.single().getState())
         assertEquals(1, context.unbindCount)
     }
 
     @Test
-    public fun `missing Bazaar answers the downloaded check without binding`() {
-        val context = BazaarContext(updateDownloaded = true, isBazaarInstalled = false)
-        val results = mutableListOf<UpdateDownloadedResult>()
+    public fun `no new version arrives as its own state`() {
+        val context = BazaarContext(state = NewVersionState.NO_NEW_VERSION)
+        val results = mutableListOf<NewVersionStateResult>()
 
-        BazaarUpdater.isUpdateDownloaded(context, results::add)
+        BazaarUpdater.getNewVersionState(context, results::add)
+        awaitResult(results)
+
+        assertEquals(NewVersionState.NO_NEW_VERSION, results.single().getState())
+        assertEquals(1, context.unbindCount)
+    }
+
+    @Test
+    public fun `an unknown answer from Bazaar counts as no new version`() {
+        val context = BazaarContext(stateValue = UNKNOWN_STATE_VALUE)
+        val results = mutableListOf<NewVersionStateResult>()
+
+        BazaarUpdater.getNewVersionState(context, results::add)
+        awaitResult(results)
+
+        assertEquals(NewVersionState.NO_NEW_VERSION, results.single().getState())
+    }
+
+    @Test
+    public fun `missing Bazaar answers the state check without binding`() {
+        val context = BazaarContext(isBazaarInstalled = false)
+        val results = mutableListOf<NewVersionStateResult>()
+
+        BazaarUpdater.getNewVersionState(context, results::add)
         awaitResult(results)
 
         assertTrue(results.single().getError() is BazaarIsNotInstalledException)
@@ -154,14 +177,13 @@ public class BazaarUpdaterTest {
     }
 
     @Test
-    public fun `unsupported Bazaar version answers the downloaded check without binding`() {
+    public fun `unsupported Bazaar version answers the state check without binding`() {
         val context = BazaarContext(
-            updateDownloaded = true,
             bazaarVersionCode = BAZAAR_CODE_UPDATE_DOWNLOADED_SUPPORTED - 1,
         )
-        val results = mutableListOf<UpdateDownloadedResult>()
+        val results = mutableListOf<NewVersionStateResult>()
 
-        BazaarUpdater.isUpdateDownloaded(context, results::add)
+        BazaarUpdater.getNewVersionState(context, results::add)
         awaitResult(results)
 
         assertTrue(results.single().getError() is BazaarIsNotUpdate)
@@ -169,11 +191,11 @@ public class BazaarUpdaterTest {
     }
 
     @Test
-    public fun `disconnect during the downloaded check answers exactly once`() {
-        val context = BazaarContext(updateDownloaded = true, disconnectAfterConnect = true)
-        val results = mutableListOf<UpdateDownloadedResult>()
+    public fun `disconnect during the state check answers exactly once`() {
+        val context = BazaarContext(disconnectAfterConnect = true)
+        val results = mutableListOf<NewVersionStateResult>()
 
-        BazaarUpdater.isUpdateDownloaded(context, results::add)
+        BazaarUpdater.getNewVersionState(context, results::add)
         awaitResult(results)
         // Give the call that lost the race the chance to answer a second time.
         settleMainLooper()
@@ -199,7 +221,8 @@ public class BazaarUpdaterTest {
 
     private inner class BazaarContext(
         private val prepareResult: Boolean = true,
-        private val updateDownloaded: Boolean = true,
+        private val state: NewVersionState = NewVersionState.NEW_VERSION_DOWNLOADED,
+        private val stateValue: Int? = null,
         private val disconnectAfterConnect: Boolean = false,
         isBazaarInstalled: Boolean = true,
         bazaarVersionCode: Int = BAZAAR_CODE_UPDATE_DOWNLOADED_SUPPORTED,
@@ -254,7 +277,11 @@ public class BazaarUpdaterTest {
 
             override fun getRemoteVersionCode(packageName: String): Long = 0
 
-            override fun isUpdateDownloaded(packageName: String): Boolean = updateDownloaded
+            override fun getNewVersionState(packageName: String): Int = stateValue ?: when (state) {
+                NewVersionState.NEW_VERSION_AVAILABLE -> NEW_VERSION_STATE_AVAILABLE
+                NewVersionState.NEW_VERSION_DOWNLOADED -> NEW_VERSION_STATE_DOWNLOADED
+                NewVersionState.NO_NEW_VERSION -> NEW_VERSION_STATE_NONE
+            }
 
             override fun prepareDownloadedUpdateInstall(packageName: String): Boolean =
                 prepareResult
@@ -264,5 +291,8 @@ public class BazaarUpdaterTest {
     private companion object {
         const val AWAIT_TIMEOUT_MILLIS = 5_000L
         const val AWAIT_STEP_MILLIS = 10L
+
+        /** A state number a future Bazaar could send that this SDK does not know. */
+        const val UNKNOWN_STATE_VALUE = 99
     }
 }

@@ -9,10 +9,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
-internal class UpdateDownloadedServiceConnection(
+internal class NewVersionStateServiceConnection(
     private val packageName: String,
     private val scope: CoroutineScope,
-    private val onResult: (Boolean) -> Unit,
+    private val onResult: (NewVersionState) -> Unit,
     private val onError: (Throwable) -> Unit,
 ) : ServiceConnection {
 
@@ -31,9 +31,9 @@ internal class UpdateDownloadedServiceConnection(
             val service = IUpdateCheckService.Stub.asInterface(boundService)
             scope.launch(Dispatchers.IO) {
                 try {
-                    val isDownloaded = service?.isUpdateDownloaded(packageName)
-                    if (isDownloaded != null) {
-                        complete { onResult(isDownloaded) }
+                    val state = service?.getNewVersionState(packageName)
+                    if (state != null) {
+                        complete { onResult(newVersionStateOf(state)) }
                     } else {
                         complete { onError(UnknownException()) }
                     }

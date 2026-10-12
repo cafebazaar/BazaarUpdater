@@ -18,18 +18,18 @@ public abstract class com/farsitel/bazaar/IAutoUpdateCheckService$Stub : android
 
 public abstract interface class com/farsitel/bazaar/IUpdateCheckService : android/os/IInterface {
 	public static final field DESCRIPTOR Ljava/lang/String;
+	public abstract fun getNewVersionState (Ljava/lang/String;)I
 	public abstract fun getRemoteVersionCode (Ljava/lang/String;)J
 	public abstract fun getVersionCode (Ljava/lang/String;)J
-	public abstract fun isUpdateDownloaded (Ljava/lang/String;)Z
 	public abstract fun prepareDownloadedUpdateInstall (Ljava/lang/String;)Z
 }
 
 public class com/farsitel/bazaar/IUpdateCheckService$Default : com/farsitel/bazaar/IUpdateCheckService {
 	public fun <init> ()V
 	public fun asBinder ()Landroid/os/IBinder;
+	public fun getNewVersionState (Ljava/lang/String;)I
 	public fun getRemoteVersionCode (Ljava/lang/String;)J
 	public fun getVersionCode (Ljava/lang/String;)J
-	public fun isUpdateDownloaded (Ljava/lang/String;)Z
 	public fun prepareDownloadedUpdateInstall (Ljava/lang/String;)Z
 }
 
@@ -50,9 +50,9 @@ public final class com/farsitel/bazaar/updater/-InstallDownloadedUpdateResult {
 	public static final fun doOnSuccess (Lcom/farsitel/bazaar/updater/InstallDownloadedUpdateResult;Lkotlin/jvm/functions/Function0;)Lcom/farsitel/bazaar/updater/InstallDownloadedUpdateResult;
 }
 
-public final class com/farsitel/bazaar/updater/-UpdateDownloadedResult {
-	public static final fun doOnError (Lcom/farsitel/bazaar/updater/UpdateDownloadedResult;Lkotlin/jvm/functions/Function1;)Lcom/farsitel/bazaar/updater/UpdateDownloadedResult;
-	public static final fun doOnResult (Lcom/farsitel/bazaar/updater/UpdateDownloadedResult;Lkotlin/jvm/functions/Function1;)Lcom/farsitel/bazaar/updater/UpdateDownloadedResult;
+public final class com/farsitel/bazaar/updater/-NewVersionStateResult {
+	public static final fun doOnError (Lcom/farsitel/bazaar/updater/NewVersionStateResult;Lkotlin/jvm/functions/Function1;)Lcom/farsitel/bazaar/updater/NewVersionStateResult;
+	public static final fun doOnResult (Lcom/farsitel/bazaar/updater/NewVersionStateResult;Lkotlin/jvm/functions/Function1;)Lcom/farsitel/bazaar/updater/NewVersionStateResult;
 }
 
 public final class com/farsitel/bazaar/updater/-UpdateResult {
@@ -120,10 +120,10 @@ public final class com/farsitel/bazaar/updater/BazaarUpdater {
 	public static final field INSTANCE Lcom/farsitel/bazaar/updater/BazaarUpdater;
 	public static final fun getLastUpdateState (Landroid/content/Context;Lcom/farsitel/bazaar/updater/OnUpdateResult;)V
 	public final synthetic fun getLastUpdateState (Landroid/content/Context;Lkotlinx/coroutines/CoroutineScope;Lcom/farsitel/bazaar/updater/OnUpdateResult;)V
+	public static final fun getNewVersionState (Landroid/content/Context;Lcom/farsitel/bazaar/updater/OnNewVersionStateResult;)V
+	public final synthetic fun getNewVersionState (Landroid/content/Context;Lkotlinx/coroutines/CoroutineScope;Lcom/farsitel/bazaar/updater/OnNewVersionStateResult;)V
 	public static final fun installDownloadedUpdate (Landroid/content/Context;)V
 	public static final fun installDownloadedUpdate (Landroid/content/Context;Lcom/farsitel/bazaar/updater/OnInstallDownloadedUpdateResult;)V
-	public static final fun isUpdateDownloaded (Landroid/content/Context;Lcom/farsitel/bazaar/updater/OnUpdateDownloadedResult;)V
-	public final synthetic fun isUpdateDownloaded (Landroid/content/Context;Lkotlinx/coroutines/CoroutineScope;Lcom/farsitel/bazaar/updater/OnUpdateDownloadedResult;)V
 	public static final fun updateApplication (Landroid/content/Context;)V
 }
 
@@ -154,6 +154,39 @@ public final class com/farsitel/bazaar/updater/InstallDownloadedUpdateResult$Suc
 	public static final field INSTANCE Lcom/farsitel/bazaar/updater/InstallDownloadedUpdateResult$Success;
 }
 
+public final class com/farsitel/bazaar/updater/NewVersionState : java/lang/Enum {
+	public static final field NEW_VERSION_AVAILABLE Lcom/farsitel/bazaar/updater/NewVersionState;
+	public static final field NEW_VERSION_DOWNLOADED Lcom/farsitel/bazaar/updater/NewVersionState;
+	public static final field NO_NEW_VERSION Lcom/farsitel/bazaar/updater/NewVersionState;
+	public static fun valueOf (Ljava/lang/String;)Lcom/farsitel/bazaar/updater/NewVersionState;
+	public static fun values ()[Lcom/farsitel/bazaar/updater/NewVersionState;
+}
+
+public abstract class com/farsitel/bazaar/updater/NewVersionStateResult {
+	public final fun getError ()Ljava/lang/Throwable;
+	public final fun getState ()Lcom/farsitel/bazaar/updater/NewVersionState;
+}
+
+public final class com/farsitel/bazaar/updater/NewVersionStateResult$Error : com/farsitel/bazaar/updater/NewVersionStateResult {
+	public fun <init> (Ljava/lang/Throwable;)V
+	public final fun component1 ()Ljava/lang/Throwable;
+	public final fun copy (Ljava/lang/Throwable;)Lcom/farsitel/bazaar/updater/NewVersionStateResult$Error;
+	public static synthetic fun copy$default (Lcom/farsitel/bazaar/updater/NewVersionStateResult$Error;Ljava/lang/Throwable;ILjava/lang/Object;)Lcom/farsitel/bazaar/updater/NewVersionStateResult$Error;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getThrowable ()Ljava/lang/Throwable;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/farsitel/bazaar/updater/NewVersionStateResult$Result : com/farsitel/bazaar/updater/NewVersionStateResult {
+	public fun <init> (Lcom/farsitel/bazaar/updater/NewVersionState;)V
+	public final fun copy (Lcom/farsitel/bazaar/updater/NewVersionState;)Lcom/farsitel/bazaar/updater/NewVersionStateResult$Result;
+	public static synthetic fun copy$default (Lcom/farsitel/bazaar/updater/NewVersionStateResult$Result;Lcom/farsitel/bazaar/updater/NewVersionState;ILjava/lang/Object;)Lcom/farsitel/bazaar/updater/NewVersionStateResult$Result;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public abstract interface class com/farsitel/bazaar/updater/OnAutoUpdateResult {
 	public abstract fun onResult (Lcom/farsitel/bazaar/updater/AutoUpdateResult;)V
 }
@@ -162,8 +195,8 @@ public abstract interface class com/farsitel/bazaar/updater/OnInstallDownloadedU
 	public abstract fun onResult (Lcom/farsitel/bazaar/updater/InstallDownloadedUpdateResult;)V
 }
 
-public abstract interface class com/farsitel/bazaar/updater/OnUpdateDownloadedResult {
-	public abstract fun onResult (Lcom/farsitel/bazaar/updater/UpdateDownloadedResult;)V
+public abstract interface class com/farsitel/bazaar/updater/OnNewVersionStateResult {
+	public abstract fun onResult (Lcom/farsitel/bazaar/updater/NewVersionStateResult;)V
 }
 
 public abstract interface class com/farsitel/bazaar/updater/OnUpdateResult {
@@ -182,31 +215,6 @@ public final class com/farsitel/bazaar/updater/UnknownException : java/lang/Runt
 	public fun <init> (Ljava/lang/String;)V
 	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun getMessage ()Ljava/lang/String;
-}
-
-public abstract class com/farsitel/bazaar/updater/UpdateDownloadedResult {
-	public final fun getError ()Ljava/lang/Throwable;
-	public final fun isDownloaded ()Z
-}
-
-public final class com/farsitel/bazaar/updater/UpdateDownloadedResult$Error : com/farsitel/bazaar/updater/UpdateDownloadedResult {
-	public fun <init> (Ljava/lang/Throwable;)V
-	public final fun component1 ()Ljava/lang/Throwable;
-	public final fun copy (Ljava/lang/Throwable;)Lcom/farsitel/bazaar/updater/UpdateDownloadedResult$Error;
-	public static synthetic fun copy$default (Lcom/farsitel/bazaar/updater/UpdateDownloadedResult$Error;Ljava/lang/Throwable;ILjava/lang/Object;)Lcom/farsitel/bazaar/updater/UpdateDownloadedResult$Error;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getThrowable ()Ljava/lang/Throwable;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class com/farsitel/bazaar/updater/UpdateDownloadedResult$Result : com/farsitel/bazaar/updater/UpdateDownloadedResult {
-	public fun <init> (Z)V
-	public final fun copy (Z)Lcom/farsitel/bazaar/updater/UpdateDownloadedResult$Result;
-	public static synthetic fun copy$default (Lcom/farsitel/bazaar/updater/UpdateDownloadedResult$Result;ZILjava/lang/Object;)Lcom/farsitel/bazaar/updater/UpdateDownloadedResult$Result;
-	public fun equals (Ljava/lang/Object;)Z
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
 }
 
 public abstract class com/farsitel/bazaar/updater/UpdateResult {

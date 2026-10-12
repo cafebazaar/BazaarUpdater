@@ -19,7 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.farsitel.bazaar.bazaarupdaterSample.ui.theme.BazaarUpdaterSampleTheme
 import com.farsitel.bazaar.updater.AutoUpdateState
-import com.farsitel.bazaar.updater.UpdateDownloadedResult
+import com.farsitel.bazaar.updater.NewVersionState
+import com.farsitel.bazaar.updater.NewVersionStateResult
 import com.farsitel.bazaar.updater.UpdateResult
 
 @Composable
@@ -80,22 +81,30 @@ fun UpdateScreen(
             }
         }
 
-        when (val result = updateState.value?.updateDownloadedResult) {
+        when (val result = updateState.value?.newVersionStateResult) {
             null -> {}
-            is UpdateDownloadedResult.Error -> ErrorView(
+            is NewVersionStateResult.Error -> ErrorView(
                 message = result.getError()?.message.orEmpty(),
             )
-            is UpdateDownloadedResult.Result -> if (result.isDownloaded()) {
-                UpdateButton(text = "Finish the downloaded update") {
+            is NewVersionStateResult.Result -> when (result.getState()) {
+                NewVersionState.NEW_VERSION_DOWNLOADED -> UpdateButton(
+                    text = "Finish the downloaded update",
+                ) {
                     onInstallDownloadedUpdateClick()
                 }
-            } else {
-                Text(
+
+                NewVersionState.NEW_VERSION_AVAILABLE -> UpdateButton(
+                    text = "Update to the new version",
+                ) {
+                    onUpdateClick()
+                }
+
+                NewVersionState.NO_NEW_VERSION, null -> Text(
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
-                    text = "Bazaar holds no downloaded update for this app",
+                    text = "No new version for this app",
                 )
             }
         }

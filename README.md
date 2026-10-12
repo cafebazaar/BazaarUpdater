@@ -174,19 +174,24 @@ To open the Bazaar Auto Update settings page for your application, call:
 BazaarAutoUpdater.enableAutoUpdate(context = context)
 ```
 
-## Downloaded but not Installed
+## New Version State
 
 Some devices, MIUI in particular, block an install that happens without the user
 being involved. Bazaar can download your update and still fail to install it, which
-leaves the update half finished and the app unaware. Use this call to detect that
-state:
+leaves the update half finished and the app unaware. Use this call to find out which
+of the three situations your app is in:
 
 ```kotlin
-BazaarUpdater.isUpdateDownloaded(context = context) { result ->
-    if (result.isDownloaded()) {
-        // Bazaar is holding a downloaded update that never reached this device
-    } else {
-        val errorMessage = result.getError()?.message
+BazaarUpdater.getNewVersionState(context = context) { result ->
+    when (result.getState()) {
+        // Bazaar downloaded a newer version and only its install is left
+        NewVersionState.NEW_VERSION_DOWNLOADED -> Unit
+        // A newer version exists, nothing is downloaded yet
+        NewVersionState.NEW_VERSION_AVAILABLE -> Unit
+        // The installed version is the newest one Bazaar knows
+        NewVersionState.NO_NEW_VERSION -> Unit
+        // result.getError() holds the failure that stopped the check
+        null -> Unit
     }
 }
 ```
@@ -195,8 +200,8 @@ BazaarUpdater.isUpdateDownloaded(context = context) { result ->
 <summary><strong>Java Usage</strong></summary>
 
 ```java
-BazaarUpdater.isUpdateDownloaded(context, result -> {
-    if (result.isDownloaded()) {
+BazaarUpdater.getNewVersionState(context, result -> {
+    if (result.getState() == NewVersionState.NEW_VERSION_DOWNLOADED) {
         // Bazaar is holding a downloaded update that never reached this device
     } else if (result.getError() != null) {
         String errorMessage = result.getError().getMessage();
@@ -208,9 +213,11 @@ BazaarUpdater.isUpdateDownloaded(context, result -> {
 
 > ⚠️ Note: This call requires Bazaar version 30.1.0 or higher.
 
-It answers `true` only for the calling application's own package, and only when all
-of these hold: Bazaar has a finished download for it, its version is newer than the
+It answers about the calling application's own package only. `NEW_VERSION_DOWNLOADED`
+holds when Bazaar has a finished download for it, its version is newer than the
 installed one, and the app on the device is signed the way Bazaar expects.
+`NEW_VERSION_AVAILABLE` holds when Bazaar knows a newer version that is not
+downloaded; it wins nothing over a waiting download.
 
 To finish that update, call `installDownloadedUpdate()`. Bazaar opens its install
 flow for the download it is holding on top of your screen, and the user only sees

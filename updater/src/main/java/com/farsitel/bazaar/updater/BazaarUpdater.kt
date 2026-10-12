@@ -62,19 +62,20 @@ public object BazaarUpdater {
     }
 
     /**
-     * Tells whether Bazaar holds an update for this application that was already
-     * downloaded but never installed, for example because the device refused the
-     * silent install that the Bazaar scheduler attempted.
+     * Tells which of the three update situations this application is in: the installed
+     * version is the newest one Bazaar knows, a newer version exists, or a newer
+     * version was already downloaded and only its install is left, for example because
+     * the device refused the silent install that the Bazaar scheduler attempted.
      *
-     * When it answers true, [installDownloadedUpdate] is the way to finish that
-     * update.
+     * When it answers [NewVersionState.NEW_VERSION_DOWNLOADED], [installDownloadedUpdate]
+     * is the way to finish that update.
      */
     @JvmStatic
-    public fun isUpdateDownloaded(
+    public fun getNewVersionState(
         context: Context,
-        listener: OnUpdateDownloadedResult,
+        listener: OnNewVersionStateResult,
     ) {
-        isUpdateDownloaded(
+        getNewVersionState(
             context = context,
             scope = retrieveScope(context),
             listener = listener,
@@ -82,17 +83,17 @@ public object BazaarUpdater {
     }
 
     @JvmSynthetic
-    public fun isUpdateDownloaded(
+    public fun getNewVersionState(
         context: Context,
         scope: CoroutineScope,
-        listener: OnUpdateDownloadedResult,
+        listener: OnNewVersionStateResult,
     ) {
         if (verifyBazaarIsInstalled(context).not()) {
-            listener.onResult(UpdateDownloadedResult.Error(BazaarIsNotInstalledException()))
-        } else if (isUpdateDownloadedSupported(context).not()) {
-            listener.onResult(UpdateDownloadedResult.Error(updateDownloadedNotSupported()))
+            listener.onResult(NewVersionStateResult.Error(BazaarIsNotInstalledException()))
+        } else if (isNewVersionStateSupported(context).not()) {
+            listener.onResult(NewVersionStateResult.Error(newVersionStateNotSupported()))
         } else {
-            initUpdateDownloadedService(
+            initNewVersionStateService(
                 context = context,
                 scope = scope,
                 listener = listener,
@@ -105,9 +106,10 @@ public object BazaarUpdater {
      * application, so the user only sees the system install dialog on top of your
      * screen. Nothing is downloaded again: Bazaar installs the file it is holding.
      *
-     * Call it from a foreground screen when [isUpdateDownloaded] answers true. On a
-     * device where Bazaar is not allowed to install apps yet, Bazaar asks for that
-     * permission in this same flow and finishes the install once it is granted.
+     * Call it from a foreground screen when [getNewVersionState] answers
+     * [NewVersionState.NEW_VERSION_DOWNLOADED]. On a device where Bazaar is not allowed
+     * to install apps yet, Bazaar asks for that permission in this same flow and
+     * finishes the install once it is granted.
      */
     @JvmStatic
     public fun installDownloadedUpdate(context: Context) {
@@ -130,8 +132,8 @@ public object BazaarUpdater {
             listener.onResult(
                 InstallDownloadedUpdateResult.Error(BazaarIsNotInstalledException()),
             )
-        } else if (isUpdateDownloadedSupported(context).not()) {
-            listener.onResult(InstallDownloadedUpdateResult.Error(updateDownloadedNotSupported()))
+        } else if (isNewVersionStateSupported(context).not()) {
+            listener.onResult(InstallDownloadedUpdateResult.Error(newVersionStateNotSupported()))
         } else {
             initPrepareInstallConnection(context = context, listener = listener)
         }
@@ -186,33 +188,33 @@ public object BazaarUpdater {
         }
     }
 
-    private fun initUpdateDownloadedService(
+    private fun initNewVersionStateService(
         context: Context,
         scope: CoroutineScope,
-        listener: OnUpdateDownloadedResult,
+        listener: OnNewVersionStateResult,
     ) {
-        lateinit var con: UpdateDownloadedServiceConnection
-        con = UpdateDownloadedServiceConnection(
+        lateinit var con: NewVersionStateServiceConnection
+        con = NewVersionStateServiceConnection(
             packageName = context.packageName,
             scope = scope,
-            onResult = { isDownloaded ->
-                listener.onResult(UpdateDownloadedResult.Result(isDownloaded))
-                releaseUpdateDownloadedService(context, con)
+            onResult = { state ->
+                listener.onResult(NewVersionStateResult.Result(state))
+                releaseNewVersionStateService(context, con)
             },
             onError = { throwable ->
-                listener.onResult(UpdateDownloadedResult.Error(throwable))
-                releaseUpdateDownloadedService(context, con)
+                listener.onResult(NewVersionStateResult.Error(throwable))
+                releaseNewVersionStateService(context, con)
             },
         )
         if (bindUpdateCheckService(context, con).not()) {
-            listener.onResult(UpdateDownloadedResult.Error(UnknownException()))
-            releaseUpdateDownloadedService(context, con)
+            listener.onResult(NewVersionStateResult.Error(UnknownException()))
+            releaseNewVersionStateService(context, con)
         }
     }
 
     private fun bindUpdateCheckService(
         context: Context,
-        con: UpdateDownloadedServiceConnection,
+        con: NewVersionStateServiceConnection,
     ): Boolean {
         val intent = Intent(BAZAAR_UPDATE_INTENT)
         intent.setPackage(BAZAAR_PACKAGE_NAME)
@@ -232,9 +234,9 @@ public object BazaarUpdater {
      * overlapping connections: each connection is unbound exactly once, and a
      * stale/never-registered connection is a no-op.
      */
-    private fun releaseUpdateDownloadedService(
+    private fun releaseNewVersionStateService(
         context: Context,
-        con: UpdateDownloadedServiceConnection,
+        con: NewVersionStateServiceConnection,
     ) {
         val shouldUnbind = synchronized(this) {
             val wasBound = con.isBound
@@ -250,13 +252,13 @@ public object BazaarUpdater {
         }
     }
 
-    private fun isUpdateDownloadedSupported(context: Context): Boolean {
+    private fun isNewVersionStateSupported(context: Context): Boolean {
         return getBazaarVersionCode(context) >= BAZAAR_CODE_UPDATE_DOWNLOADED_SUPPORTED
     }
 
-    private fun updateDownloadedNotSupported(): Throwable {
+    private fun newVersionStateNotSupported(): Throwable {
         return BazaarIsNotUpdate(
-            "The downloaded-update check is supported in bazaar version" +
+            "The new-version state is supported in bazaar version" +
                 " $BAZAAR_CODE_UPDATE_DOWNLOADED_SUPPORTED and above",
         )
     }

@@ -214,10 +214,12 @@ BazaarUpdater.getNewVersionState(context, result -> {
 > ⚠️ Note: This call requires Bazaar version 30.1.0 or higher.
 
 It answers about the calling application's own package only. `NEW_VERSION_DOWNLOADED`
-holds when Bazaar has a finished download for it, its version is newer than the
-installed one, and the app on the device is signed the way Bazaar expects.
-`NEW_VERSION_AVAILABLE` holds when Bazaar knows a newer version that is not
-downloaded; it wins nothing over a waiting download.
+holds when Bazaar has a finished download for it, that download is still the newest
+version Bazaar knows, its version is newer than the installed one, and the app on the
+device is signed the way Bazaar expects. `NEW_VERSION_AVAILABLE` holds when Bazaar
+knows a newer version that is not downloaded — including the case where the download
+it is holding has been overtaken by a newer release, so the next step is a normal
+update rather than finishing the older file.
 
 To finish that update, call `installDownloadedUpdate()`. Bazaar opens its install
 flow for the download it is holding on top of your screen, and the user only sees

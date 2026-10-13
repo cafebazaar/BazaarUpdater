@@ -8,4 +8,6 @@ data class UpdateState(
     val updateResult: UpdateResult? = null,
     val autoUpdateResult: AutoUpdateResult? = null,
     val newVersionStateResult: NewVersionStateResult? = null,
+    val isInstallingDownloadedUpdate: Boolean = false,
+    val isCheckingUpdateState: Boolean = false,
 )

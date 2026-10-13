@@ -12,8 +12,8 @@ interface IUpdateCheckService {
      * Only the app that owns the package can ask about it: the caller is identified by
      * the uid behind the package name it passes, and anything else answers 0.
      *
-     * When it answers 2, the caller finishes that download through Bazaar's own app
-     * page, which already installs a ready download when the user taps install there.
+     * When it answers 2, the caller finishes that download with
+     * prepareDownloadedUpdateInstall below and the install window that follows it.
      */
     int getNewVersionState(String packageName);
 

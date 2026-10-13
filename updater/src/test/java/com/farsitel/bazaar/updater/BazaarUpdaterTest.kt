@@ -1,6 +1,7 @@
 package com.farsitel.bazaar.updater
 
 import android.app.Application
+import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.ContextWrapper
 import android.content.Intent
@@ -53,6 +54,18 @@ public class BazaarUpdaterTest {
                 "&$PREPARED_QUERY",
             context.startedActivities.single().data.toString(),
         )
+        assertEquals(1, context.unbindCount)
+    }
+
+    @Test
+    public fun `a window that cannot be opened is reported as an error`() {
+        val context = BazaarContext(prepareResult = true, startActivityFails = true)
+        val results = mutableListOf<InstallDownloadedUpdateResult>()
+
+        BazaarUpdater.installDownloadedUpdate(context, results::add)
+        awaitResult(results)
+
+        assertTrue(results.single().getError() is InstallWindowNotOpenedException)
         assertEquals(1, context.unbindCount)
     }
 
@@ -221,6 +234,7 @@ public class BazaarUpdaterTest {
 
     private inner class BazaarContext(
         private val prepareResult: Boolean = true,
+        private val startActivityFails: Boolean = false,
         private val state: NewVersionState = NewVersionState.NEW_VERSION_DOWNLOADED,
         private val stateValue: Int? = null,
         private val disconnectAfterConnect: Boolean = false,
@@ -269,6 +283,7 @@ public class BazaarUpdaterTest {
         }
 
         override fun startActivity(intent: Intent) {
+            if (startActivityFails) throw ActivityNotFoundException()
             startedActivities += intent
         }
 

@@ -263,8 +263,15 @@ BazaarUpdater.installDownloadedUpdate(context = context)
 
 Nothing is downloaded again. If the user has not allowed Bazaar to install apps on
 this device yet, Bazaar asks for that permission in this same flow and finishes the
-install as soon as it is granted. Installed Bazaar versions that do not know this
-action simply do nothing, so it is safe to call.
+install as soon as it is granted.
+
+Two outcomes are worth handling in the listener form: `InstallWindowNotOpenedException`
+when nothing could be opened — call it while a screen of your app is visible, because a
+background app cannot open an activity from Android 10 on — and
+`InstallDownloadedUpdateException` when Bazaar refused the download it holds; nothing can
+be finished that way, so fall back to `updateApplication()`. The fire-and-forget form
+above skips the prepare step, and on an installed Bazaar version that does not know this
+action it simply does nothing, so it is safe to call.
 
 
 ## Contributing

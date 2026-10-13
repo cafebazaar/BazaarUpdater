@@ -1,5 +1,6 @@
 package com.farsitel.bazaar.updater
 
+import android.app.ActivityManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -122,6 +123,13 @@ public object BazaarUpdater {
      * shown when that request succeeds, and [listener] is told about the failure
      * otherwise, for example when there is no connection or the server answers with an
      * error.
+     *
+     * Call it while a screen of your app is visible to the user: from Android 10 on a
+     * background app cannot open an activity, and the platform drops that request
+     * silently, so the listener would get [InstallWindowNotOpenedException] without
+     * anything on screen. When Bazaar refuses the prepared download —
+     * [InstallDownloadedUpdateException] — nothing can be finished this way, and
+     * [updateApplication] is the fallback that updates the app normally.
      */
     @JvmStatic
     public fun installDownloadedUpdate(
@@ -148,8 +156,17 @@ public object BazaarUpdater {
             packageName = context.packageName,
             scope = retrieveScope(context),
             onPrepared = {
-                openDownloadedUpdateInstall(context = context, isPrepared = true)
-                listener.onResult(InstallDownloadedUpdateResult.Success)
+                val isWindowOpened = openDownloadedUpdateInstall(
+                    context = context,
+                    isPrepared = true,
+                )
+                if (isWindowOpened) {
+                    listener.onResult(InstallDownloadedUpdateResult.Success)
+                } else {
+                    listener.onResult(
+                        InstallDownloadedUpdateResult.Error(InstallWindowNotOpenedException()),
+                    )
+                }
             },
             onError = { throwable ->
                 listener.onResult(InstallDownloadedUpdateResult.Error(throwable))
@@ -160,7 +177,11 @@ public object BazaarUpdater {
         }
     }
 
-    private fun openDownloadedUpdateInstall(context: Context, isPrepared: Boolean = false) {
+    private fun openDownloadedUpdateInstall(context: Context, isPrepared: Boolean = false): Boolean {
+        // From Android 10 on, a process that is neither visible nor running a foreground service
+        // cannot start an activity, and the platform drops the request without any error, so the
+        // caller has to be told instead of assuming the window opened.
+        if (canStartActivityFromBackground().not()) return false
         val preparedParameter = if (isPrepared) "&$PREPARED_QUERY" else ""
         val intent = Intent(
             Intent.ACTION_VIEW,
@@ -170,11 +191,22 @@ public object BazaarUpdater {
             setPackage(BAZAAR_PACKAGE_NAME)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
-        try {
+        return try {
             context.startActivity(intent)
+            true
         } catch (ignored: ActivityNotFoundException) {
             // Installed Bazaar version does not support this deep link yet.
+            false
         }
+    }
+
+    private fun canStartActivityFromBackground(): Boolean {
+        val processInfo = ActivityManager.RunningAppProcessInfo()
+        ActivityManager.getMyMemoryState(processInfo)
+        // IMPORTANCE_FOREGROUND, IMPORTANCE_VISIBLE and IMPORTANCE_FOREGROUND_SERVICE are the
+        // importances the platform lets start an activity from; a service, background or cached
+        // process is refused silently.
+        return processInfo.importance < ActivityManager.RunningAppProcessInfo.IMPORTANCE_SERVICE
     }
 
     @OptIn(DelicateCoroutinesApi::class)

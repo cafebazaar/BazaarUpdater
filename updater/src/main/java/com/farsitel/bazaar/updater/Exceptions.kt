@@ -20,6 +20,11 @@ public class InstallDownloadedUpdateException(
     override val message: String = "Bazaar could not prepare the downloaded update for installation!"
 ) : RuntimeException()
 
+public class InstallWindowNotOpenedException(
+    override val message: String = "Bazaar's install window could not be opened. Call" +
+            " installDownloadedUpdate while a screen of your app is visible to the user."
+) : RuntimeException()
+
 public class ServiceDisconnectionException(
     public val componentName: ComponentName?,
     override val message: String = "Service $componentName is disconnected."

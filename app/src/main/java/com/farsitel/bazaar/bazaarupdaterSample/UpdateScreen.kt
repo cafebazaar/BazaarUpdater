@@ -106,12 +106,20 @@ fun UpdateScreen(
                     onUpdateClick()
                 }
 
-                NewVersionState.NO_NEW_VERSION, null -> Text(
+                NewVersionState.NO_NEW_VERSION -> Text(
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     text = "No new version for this app",
+                )
+
+                NewVersionState.UNKNOWN -> Text(
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    text = "Unknown update state",
                 )
             }
         }

@@ -15,11 +15,13 @@ internal const val BAZAAR_ERROR_RESULT = -1L
 
 /**
  * The numbers of [IUpdateCheckService.getNewVersionState]; the AIDL documents the
- * contract. Anything else that ever crosses the binder is treated as [NEW_VERSION_STATE_NONE].
+ * contract. 0 is the unknown default, and any other number that ever crosses the binder
+ * unrecognized is treated as [NEW_VERSION_STATE_UNKNOWN].
  */
-internal const val NEW_VERSION_STATE_NONE = 0
-internal const val NEW_VERSION_STATE_AVAILABLE = 1
-internal const val NEW_VERSION_STATE_DOWNLOADED = 2
+internal const val NEW_VERSION_STATE_UNKNOWN = 0
+internal const val NEW_VERSION_STATE_NONE = 1
+internal const val NEW_VERSION_STATE_AVAILABLE = 2
+internal const val NEW_VERSION_STATE_DOWNLOADED = 3
 
 internal const val BAZAAR_CODE_REMOTE_VERSION_SUPPORTED = 2400700
 internal const val BAZAAR_CODE_AUTO_UPDATE_SUPPORTED = 2600200

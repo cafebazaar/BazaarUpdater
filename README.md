@@ -190,8 +190,8 @@ BazaarUpdater.getNewVersionState(context = context) { result ->
         NewVersionState.NEW_VERSION_AVAILABLE -> Unit
         // The installed version is the newest one Bazaar knows
         NewVersionState.NO_NEW_VERSION -> Unit
-        // result.getError() holds the failure that stopped the check
-        null -> Unit
+        // The check failed or Bazaar sent a state this SDK does not know
+        NewVersionState.UNKNOWN -> Unit
     }
 }
 ```
@@ -219,7 +219,9 @@ version Bazaar knows, its version is newer than the installed one, and the app o
 device is signed the way Bazaar expects. `NEW_VERSION_AVAILABLE` holds when Bazaar
 knows a newer version that is not downloaded — including the case where the download
 it is holding has been overtaken by a newer release, so the next step is a normal
-update rather than finishing the older file.
+update rather than finishing the older file. `UNKNOWN` is not one of those situations:
+it is what the result answers when there is no state to report — the check failed and
+`getError()` holds why, or Bazaar sent a number this SDK does not know yet.
 
 To finish that update, call `installDownloadedUpdate()`. Bazaar opens its install
 flow for the download it is holding on top of your screen, and the user only sees

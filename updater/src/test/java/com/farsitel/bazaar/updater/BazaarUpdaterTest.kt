@@ -167,14 +167,23 @@ public class BazaarUpdaterTest {
     }
 
     @Test
-    public fun `an unknown answer from Bazaar counts as no new version`() {
+    public fun `an unknown answer from Bazaar counts as unknown`() {
         val context = BazaarContext(stateValue = UNKNOWN_STATE_VALUE)
         val results = mutableListOf<NewVersionStateResult>()
 
         BazaarUpdater.getNewVersionState(context, results::add)
         awaitResult(results)
 
-        assertEquals(NewVersionState.NO_NEW_VERSION, results.single().getState())
+        assertEquals(NewVersionState.UNKNOWN, results.single().getState())
+    }
+
+    @Test
+    public fun `each wire number maps to its state`() {
+        assertEquals(NewVersionState.UNKNOWN, newVersionStateOf(0))
+        assertEquals(NewVersionState.NO_NEW_VERSION, newVersionStateOf(1))
+        assertEquals(NewVersionState.NEW_VERSION_AVAILABLE, newVersionStateOf(2))
+        assertEquals(NewVersionState.NEW_VERSION_DOWNLOADED, newVersionStateOf(3))
+        assertEquals(NewVersionState.UNKNOWN, newVersionStateOf(UNKNOWN_STATE_VALUE))
     }
 
     @Test
@@ -186,6 +195,7 @@ public class BazaarUpdaterTest {
         awaitResult(results)
 
         assertTrue(results.single().getError() is BazaarIsNotInstalledException)
+        assertEquals(NewVersionState.UNKNOWN, results.single().getState())
         assertEquals(0, context.bindCount)
     }
 
@@ -293,6 +303,7 @@ public class BazaarUpdaterTest {
             override fun getRemoteVersionCode(packageName: String): Long = 0
 
             override fun getNewVersionState(packageName: String): Int = stateValue ?: when (state) {
+                NewVersionState.UNKNOWN -> NEW_VERSION_STATE_UNKNOWN
                 NewVersionState.NEW_VERSION_AVAILABLE -> NEW_VERSION_STATE_AVAILABLE
                 NewVersionState.NEW_VERSION_DOWNLOADED -> NEW_VERSION_STATE_DOWNLOADED
                 NewVersionState.NO_NEW_VERSION -> NEW_VERSION_STATE_NONE

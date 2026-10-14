@@ -1,9 +1,21 @@
 package com.farsitel.bazaar.updater
 
 /**
- * Which of the three update situations this application is in, as Bazaar knows it.
+ * Which update situation this application is in, as Bazaar knows it.
  */
 public enum class NewVersionState {
+
+    /**
+     * The check did not produce a state: it failed, or Bazaar answered with a number
+     * this SDK does not know. [NewVersionStateResult.getError] explains a failed check.
+     */
+    UNKNOWN,
+
+    /**
+     * The installed version is the newest one Bazaar knows, so there is nothing to
+     * install.
+     */
+    NO_NEW_VERSION,
 
     /**
      * Bazaar knows a newer version, but it is not downloaded yet, so there is nothing
@@ -17,20 +29,14 @@ public enum class NewVersionState {
      * [BazaarUpdater.installDownloadedUpdate] is the way to finish it.
      */
     NEW_VERSION_DOWNLOADED,
-
-    /**
-     * The installed version is the newest one Bazaar knows, so there is nothing to
-     * install.
-     */
-    NO_NEW_VERSION,
 }
 
 internal fun newVersionStateOf(value: Int): NewVersionState {
     return when (value) {
+        NEW_VERSION_STATE_NONE -> NewVersionState.NO_NEW_VERSION
         NEW_VERSION_STATE_AVAILABLE -> NewVersionState.NEW_VERSION_AVAILABLE
         NEW_VERSION_STATE_DOWNLOADED -> NewVersionState.NEW_VERSION_DOWNLOADED
-        NEW_VERSION_STATE_NONE -> NewVersionState.NO_NEW_VERSION
-        // An answer this SDK does not know is treated as nothing to install.
-        else -> NewVersionState.NO_NEW_VERSION
+        // Wire 0 is UNKNOWN, and so is any number a future Bazaar could send.
+        else -> NewVersionState.UNKNOWN
     }
 }

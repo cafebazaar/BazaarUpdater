@@ -165,6 +165,7 @@ public final class com/farsitel/bazaar/updater/NewVersionState : java/lang/Enum 
 	public static final field NEW_VERSION_AVAILABLE Lcom/farsitel/bazaar/updater/NewVersionState;
 	public static final field NEW_VERSION_DOWNLOADED Lcom/farsitel/bazaar/updater/NewVersionState;
 	public static final field NO_NEW_VERSION Lcom/farsitel/bazaar/updater/NewVersionState;
+	public static final field UNKNOWN Lcom/farsitel/bazaar/updater/NewVersionState;
 	public static fun valueOf (Ljava/lang/String;)Lcom/farsitel/bazaar/updater/NewVersionState;
 	public static fun values ()[Lcom/farsitel/bazaar/updater/NewVersionState;
 }

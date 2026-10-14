@@ -15,9 +15,9 @@ public sealed class NewVersionStateResult {
 
     public data class Error(val throwable: Throwable) : NewVersionStateResult()
 
-    /** The state Bazaar reported, or null when the check failed. */
-    public fun getState(): NewVersionState? {
-        return (this as? Result)?.state
+    /** The state Bazaar reported, or [NewVersionState.UNKNOWN] when the check failed. */
+    public fun getState(): NewVersionState {
+        return (this as? Result)?.state ?: NewVersionState.UNKNOWN
     }
 
     public fun getError(): Throwable? {
@@ -28,7 +28,10 @@ public sealed class NewVersionStateResult {
 public inline fun NewVersionStateResult.doOnResult(
     call: (NewVersionState) -> Unit,
 ): NewVersionStateResult {
-    getState()?.let(call)
+    when (val state = getState()) {
+        NewVersionState.UNKNOWN -> Unit
+        else -> call(state)
+    }
     return this
 }
 

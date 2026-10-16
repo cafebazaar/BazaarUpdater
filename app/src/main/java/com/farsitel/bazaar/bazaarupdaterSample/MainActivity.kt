@@ -1,6 +1,7 @@
 package com.farsitel.bazaar.bazaarupdaterSample
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -20,6 +21,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         checkAutoUpdateState()
+        checkNewVersionState()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +36,7 @@ class MainActivity : ComponentActivity() {
                         onUpdateClick = ::updateApplication,
                         onAutoUpdateClick = ::enableAutoUpdate,
                         onCheckVersionClick = ::checkUpdateState,
+                        onInstallDownloadedUpdateClick = ::installDownloadedUpdate,
                     )
                 }
             }
@@ -54,9 +57,29 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun checkNewVersionState() {
+        BazaarUpdater.getNewVersionState(context = this) { result ->
+            updateState.value = updateState.value.copy(newVersionStateResult = result)
+        }
+    }
+
+    private fun installDownloadedUpdate() {
+        updateState.value = updateState.value.copy(isInstallingDownloadedUpdate = true)
+        BazaarUpdater.installDownloadedUpdate(context = this) { result ->
+            updateState.value = updateState.value.copy(isInstallingDownloadedUpdate = false)
+            result.getError()?.let { error ->
+                Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun checkUpdateState() {
+        updateState.value = updateState.value.copy(isCheckingUpdateState = true)
         BazaarUpdater.getLastUpdateState(context = this) { result ->
-            updateState.value = updateState.value.copy(updateResult = result)
+            updateState.value = updateState.value.copy(
+                updateResult = result,
+                isCheckingUpdateState = false,
+            )
         }
     }
 }

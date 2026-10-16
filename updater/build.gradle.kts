@@ -51,13 +51,15 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
 }
 publishing {
     publications {
         create("release", MavenPublication::class) {
             groupId = "com.farsitel.bazaar"
             artifactId = "updater"
-            version = "1.1.3"
+            version = "1.2.0"
 
             afterEvaluate {
                 from(components["release"])

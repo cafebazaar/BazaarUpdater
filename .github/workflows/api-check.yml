@@ -24,3 +24,18 @@ jobs:
         run: chmod +x gradlew
       - name: Validate binary api
         run: ./gradlew clean apiCheck
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Run updater unit tests
+        run: ./gradlew :updater:testDebugUnitTest

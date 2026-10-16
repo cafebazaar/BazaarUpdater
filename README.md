@@ -174,6 +174,108 @@ To open the Bazaar Auto Update settings page for your application, call:
 BazaarAutoUpdater.enableAutoUpdate(context = context)
 ```
 
+## New Version State
+
+Some devices, MIUI in particular, block an install that happens without the user
+being involved. Bazaar can download your update and still fail to install it, which
+leaves the update half finished and the app unaware. Use this call to find out which
+of the three situations your app is in:
+
+```kotlin
+BazaarUpdater.getNewVersionState(context = context) { result ->
+    when (result.getState()) {
+        // Bazaar downloaded a newer version and only its install is left
+        NewVersionState.NEW_VERSION_DOWNLOADED -> Unit
+        // A newer version exists, nothing is downloaded yet
+        NewVersionState.NEW_VERSION_AVAILABLE -> Unit
+        // The installed version is the newest one Bazaar knows
+        NewVersionState.NO_NEW_VERSION -> Unit
+        // The check failed or Bazaar sent a state this SDK does not know
+        NewVersionState.UNKNOWN -> Unit
+    }
+}
+```
+
+<details>
+<summary><strong>Java Usage</strong></summary>
+
+```java
+BazaarUpdater.getNewVersionState(context, result -> {
+    if (result.getState() == NewVersionState.NEW_VERSION_DOWNLOADED) {
+        // Bazaar is holding a downloaded update that never reached this device
+    } else if (result.getError() != null) {
+        String errorMessage = result.getError().getMessage();
+    }
+});
+```
+
+</details>
+
+> ⚠️ Note: This call requires Bazaar version 30.1.0 or higher.
+
+It answers about the calling application's own package only. `NEW_VERSION_DOWNLOADED`
+holds when Bazaar has a finished download for it, that download is still the newest
+version Bazaar knows, its version is newer than the installed one, and the app on the
+device is signed the way Bazaar expects. `NEW_VERSION_AVAILABLE` holds when Bazaar
+knows a newer version that is not downloaded — including the case where the download
+it is holding has been overtaken by a newer release, so the next step is a normal
+update rather than finishing the older file. `UNKNOWN` is not one of those situations:
+it is what the result answers when there is no state to report — the check failed and
+`getError()` holds why, or Bazaar sent a number this SDK does not know yet.
+
+To finish that update, call `installDownloadedUpdate()`. Bazaar opens its install
+flow for the download it is holding on top of your screen, and the user only sees
+the system install dialog:
+
+```kotlin
+BazaarUpdater.installDownloadedUpdate(context = context) { result ->
+    result.doOnSuccess {
+        // Bazaar fetched the install details and opened its install flow
+    }.doOnError { error ->
+        // Nothing was opened: no connection, a server error, or no finished download
+        val errorMessage = error.message
+    }
+}
+```
+
+<details>
+<summary><strong>Java Usage</strong></summary>
+
+```java
+BazaarUpdater.installDownloadedUpdate(context, result -> {
+    if (result.isSuccess()) {
+        // Bazaar fetched the install details and opened its install flow
+    } else {
+        String errorMessage = result.getError().getMessage();
+    }
+});
+```
+
+</details>
+
+Use this listener form while your app is in the foreground: Bazaar checks that it
+still holds the download and fetches its install details before any window is
+opened, so an offline or slow device never opens an install window that cannot do
+anything. The fire-and-forget form below skips that step, and is kept for callers
+that do not need to know the outcome:
+
+```kotlin
+BazaarUpdater.installDownloadedUpdate(context = context)
+```
+
+Nothing is downloaded again. If the user has not allowed Bazaar to install apps on
+this device yet, Bazaar asks for that permission in this same flow and finishes the
+install as soon as it is granted.
+
+Two outcomes are worth handling in the listener form: `InstallWindowNotOpenedException`
+when nothing could be opened — call it while a screen of your app is visible, because a
+background app cannot open an activity from Android 10 on — and
+`InstallDownloadedUpdateException` when Bazaar refused the download it holds; nothing can
+be finished that way, so fall back to `updateApplication()`. The fire-and-forget form
+above skips the prepare step, and on an installed Bazaar version that does not know this
+action it simply does nothing, so it is safe to call.
+
+
 ## Contributing
 
 Contributions are welcome! If you have suggestions or improvements, please open an issue or submit a pull request.

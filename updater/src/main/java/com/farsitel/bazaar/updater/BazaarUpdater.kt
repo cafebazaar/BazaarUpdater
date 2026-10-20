@@ -17,6 +17,11 @@ public object BazaarUpdater {
 
     private var connection: WeakReference<UpdateServiceConnection>? = null
 
+    @Deprecated(
+        message = "Use getNewVersionState, which distinguishes a newer version from one that " +
+            "is already downloaded and only needs its install. It requires Bazaar 30.1.0 or " +
+            "newer; on older Bazaars this check is still the one to call.",
+    )
     @JvmStatic
     public fun getLastUpdateState(
         context: Context,
@@ -29,6 +34,11 @@ public object BazaarUpdater {
         )
     }
 
+    @Deprecated(
+        message = "Use getNewVersionState, which distinguishes a newer version from one that " +
+            "is already downloaded and only needs its install. It requires Bazaar 30.1.0 or " +
+            "newer; on older Bazaars this check is still the one to call.",
+    )
     @JvmSynthetic
     public fun getLastUpdateState(
         context: Context,

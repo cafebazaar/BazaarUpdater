@@ -73,7 +73,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @Suppress("DEPRECATION")
     private fun checkUpdateState() {
+        // The legacy check still works on every Bazaar; getNewVersionState needs 30.1.0+.
         updateState.value = updateState.value.copy(isCheckingUpdateState = true)
         BazaarUpdater.getLastUpdateState(context = this) { result ->
             updateState.value = updateState.value.copy(

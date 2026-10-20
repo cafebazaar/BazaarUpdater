@@ -52,6 +52,11 @@ dependencies {
 
 ### Checking for Updates
 
+> ⚠️ **Deprecated:** `getLastUpdateState` is superseded by `getNewVersionState`, which tells a
+> newer version apart from an update that is already downloaded and only needs its install.
+> `getNewVersionState` requires Bazaar 30.1.0 or newer (`BazaarIsNotUpdate` below that), so keep
+> using `getLastUpdateState` for older Bazaars.
+
 To check if there are any updates available for your application on Bazaar, use the following code:
 
 

@@ -11,17 +11,14 @@ import com.farsitel.bazaar.updater.VersionParser.parseUpdateResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
 public object BazaarUpdater {
 
     private var connection: WeakReference<UpdateServiceConnection>? = null
 
-    @Deprecated(
-        message = "Use getNewVersionState, which distinguishes a newer version from one that " +
-            "is already downloaded and only needs its install. It requires Bazaar 30.1.0 or " +
-            "newer; on older Bazaars this check is still the one to call.",
-    )
+    @Deprecated(LAST_UPDATE_STATE_DEPRECATION)
     @JvmStatic
     public fun getLastUpdateState(
         context: Context,
@@ -34,11 +31,7 @@ public object BazaarUpdater {
         )
     }
 
-    @Deprecated(
-        message = "Use getNewVersionState, which distinguishes a newer version from one that " +
-            "is already downloaded and only needs its install. It requires Bazaar 30.1.0 or " +
-            "newer; on older Bazaars this check is still the one to call.",
-    )
+    @Deprecated(LAST_UPDATE_STATE_DEPRECATION)
     @JvmSynthetic
     public fun getLastUpdateState(
         context: Context,
@@ -80,6 +73,11 @@ public object BazaarUpdater {
      *
      * When it answers [NewVersionState.NEW_VERSION_DOWNLOADED], [installDownloadedUpdate]
      * is the way to finish that update.
+     *
+     * A Bazaar older than 30.1.0 cannot answer the downloaded state; the call then falls
+     * back to the legacy version check, which tells a newer version from the newest one,
+     * so those devices answer [NewVersionState.NO_NEW_VERSION] or
+     * [NewVersionState.NEW_VERSION_AVAILABLE] instead of the downloaded one.
      */
     @JvmStatic
     public fun getNewVersionState(
@@ -102,7 +100,11 @@ public object BazaarUpdater {
         if (verifyBazaarIsInstalled(context).not()) {
             listener.onResult(NewVersionStateResult.Error(BazaarIsNotInstalledException()))
         } else if (isNewVersionStateSupported(context).not()) {
-            listener.onResult(NewVersionStateResult.Error(newVersionStateNotSupported()))
+            answerLegacyNewVersionState(
+                context = context,
+                scope = scope,
+                listener = listener,
+            )
         } else {
             initNewVersionStateService(
                 context = context,
@@ -151,7 +153,7 @@ public object BazaarUpdater {
                 InstallDownloadedUpdateResult.Error(BazaarIsNotInstalledException()),
             )
         } else if (isNewVersionStateSupported(context).not()) {
-            listener.onResult(InstallDownloadedUpdateResult.Error(newVersionStateNotSupported()))
+            listener.onResult(InstallDownloadedUpdateResult.Error(downloadedUpdateInstallNotSupported()))
         } else {
             initPrepareInstallConnection(context = context, listener = listener)
         }
@@ -298,11 +300,46 @@ public object BazaarUpdater {
         return getBazaarVersionCode(context) >= BAZAAR_CODE_UPDATE_DOWNLOADED_SUPPORTED
     }
 
-    private fun newVersionStateNotSupported(): Throwable {
+    private fun downloadedUpdateInstallNotSupported(): Throwable {
         return BazaarIsNotUpdate(
-            "The new-version state is supported in bazaar version" +
+            "Installing the downloaded update is supported in bazaar version" +
                 " $BAZAAR_CODE_UPDATE_DOWNLOADED_SUPPORTED and above",
         )
+    }
+
+    /**
+     * A Bazaar that cannot answer [IUpdateCheckService.getNewVersionState] still answers the
+     * legacy version check, which tells a newer version from the newest one — just not a
+     * downloaded one. Its result is mapped to the state shape and delivered on the main
+     * thread, like every other answer of this SDK.
+     */
+    private fun answerLegacyNewVersionState(
+        context: Context,
+        scope: CoroutineScope,
+        listener: OnNewVersionStateResult,
+    ) {
+        initService(
+            context = context,
+            scope = scope,
+            listener = OnUpdateResult { result ->
+                mainThreadScope.launch {
+                    listener.onResult(result.toNewVersionStateResult())
+                }
+            },
+        )
+    }
+
+    private fun UpdateResult.toNewVersionStateResult(): NewVersionStateResult {
+        return when (this) {
+            UpdateResult.AlreadyUpdated ->
+                NewVersionStateResult.Result(NewVersionState.NO_NEW_VERSION)
+
+            is UpdateResult.NeedUpdate ->
+                NewVersionStateResult.Result(NewVersionState.NEW_VERSION_AVAILABLE)
+
+            is UpdateResult.Error ->
+                NewVersionStateResult.Error(getError() ?: UnknownException())
+        }
     }
 
     private fun initService(
@@ -348,3 +385,8 @@ public object BazaarUpdater {
         connection = null
     }
 }
+
+private const val LAST_UPDATE_STATE_DEPRECATION =
+    "Use getNewVersionState instead, which distinguishes a newer version from one that is " +
+        "already downloaded and only needs its install, and falls back to this check on " +
+        "Bazaars older than 30.1.0."

@@ -37,7 +37,7 @@ repositories {
 
 ```kotlin
 dependencies {
-    implementation("com.github.cafebazaar:bazaarUpdater:1.2.0")
+    implementation("com.github.cafebazaar:bazaarUpdater:1.2.1")
 }
 ```
 
@@ -45,58 +45,10 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'com.github.cafebazaar:bazaarUpdater:1.2.0'
+    implementation 'com.github.cafebazaar:bazaarUpdater:1.2.1'
 }
 ```
 ## Usage
-
-### Checking for Updates
-
-To check if there are any updates available for your application on Bazaar, use the following code:
-
-
-```kotlin
-BazaarUpdater.getLastUpdateState(context = context) { result ->
-    when(result) {
-        UpdateResult.AlreadyUpdated -> {
-            // Handle the case where the app is already updated
-        }
-        is UpdateResult.Error -> {
-            // Handle the error case
-            val errorMessage = result.getError()?.message
-        }
-        is UpdateResult.NeedUpdate -> {
-            // Handle the case where an update is needed
-            val targetVersion = result.getTargetVersionCode()
-        }
-    }
-}
-```
-
-<details><summary><b>Java Usage</b></summary>
-
-```java
-BazaarUpdater.getLastUpdateState(context, result -> {
-    if (result.isAlreadyUpdated()) {
-        // Handle the case where the app is already updated
-    } else if (result.isUpdateNeeded()) {
-        // Handle the case where an update is needed
-        long targetVersion = result.getTargetVersionCode();
-    } else {
-        // Handle the error case
-        String errorMessage = result.getError().getMessage();
-    }
-});
-```
-</details>
-
-#### Update Result States
-
-##### 1. AlreadyUpdated: Indicates that your application is up-to-date.
-
-##### 2. Error: Indicates an error occurred. Use `result.message` to get the error message.
-
-##### 3. NeedUpdate: Indicates that a new update is available. Use `result.getTargetVersionCode()` to get the version code of the update.
 
 ### Updating the Application
 
@@ -211,7 +163,9 @@ BazaarUpdater.getNewVersionState(context, result -> {
 
 </details>
 
-> ⚠️ Note: This call requires Bazaar version 30.1.0 or higher.
+> ⚠️ `NEW_VERSION_DOWNLOADED` requires Bazaar version 30.1.0 or higher. On older Bazaars the call
+> falls back to the legacy version check, which only tells a newer version from the newest one, so
+> those devices answer `NO_NEW_VERSION` or `NEW_VERSION_AVAILABLE` and never the downloaded state.
 
 It answers about the calling application's own package only. `NEW_VERSION_DOWNLOADED`
 holds when Bazaar has a finished download for it, that download is still the newest

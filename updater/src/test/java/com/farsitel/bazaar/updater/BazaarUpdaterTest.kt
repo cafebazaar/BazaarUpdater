@@ -3,6 +3,7 @@ package com.farsitel.bazaar.updater
 import android.app.Application
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
+import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.ServiceConnection
@@ -10,11 +11,11 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.os.Build
 import android.os.Handler
-import android.os.IBinder
 import android.os.Looper
+import android.os.RemoteException
 import com.farsitel.bazaar.IUpdateCheckService
+import kotlinx.coroutines.CoroutineScope
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -200,17 +201,105 @@ public class BazaarUpdaterTest {
     }
 
     @Test
-    public fun `unsupported Bazaar version answers the state check without binding`() {
+    public fun `an older Bazaar answers a newer version from the legacy check`() {
         val context = BazaarContext(
             bazaarVersionCode = BAZAAR_CODE_UPDATE_DOWNLOADED_SUPPORTED - 1,
+            legacyVersionCode = 1,
+        )
+        val results = mutableListOf<NewVersionStateResult>()
+        var callbackOnMainThread = false
+
+        BazaarUpdater.getNewVersionState(context) { result ->
+            callbackOnMainThread = Looper.myLooper() == Looper.getMainLooper()
+            results += result
+        }
+        awaitResult(results)
+
+        assertEquals(NewVersionState.NEW_VERSION_AVAILABLE, results.single().getState())
+        assertTrue(callbackOnMainThread)
+        assertEquals(1, context.bindCount)
+        assertEquals(1, context.unbindCount)
+        assertEquals(1, context.legacyRemoteVersionCodeCalls)
+        assertEquals(0, context.legacyVersionCodeCalls)
+    }
+
+    @Test
+    public fun `an older Bazaar that is up to date answers no new version`() {
+        val context = BazaarContext(
+            bazaarVersionCode = BAZAAR_CODE_UPDATE_DOWNLOADED_SUPPORTED - 1,
+            legacyVersionCode = 0,
         )
         val results = mutableListOf<NewVersionStateResult>()
 
         BazaarUpdater.getNewVersionState(context, results::add)
         awaitResult(results)
 
-        assertTrue(results.single().getError() is BazaarIsNotUpdate)
-        assertEquals(0, context.bindCount)
+        assertEquals(NewVersionState.NO_NEW_VERSION, results.single().getState())
+        assertEquals(1, context.unbindCount)
+    }
+
+    @Test
+    public fun `an older Bazaar whose legacy check fails answers the error`() {
+        val context = BazaarContext(
+            bazaarVersionCode = BAZAAR_CODE_UPDATE_DOWNLOADED_SUPPORTED - 1,
+            legacyError = true,
+        )
+        val results = mutableListOf<NewVersionStateResult>()
+
+        BazaarUpdater.getNewVersionState(context, results::add)
+        awaitResult(results)
+
+        assertTrue(results.single().getError() != null)
+        assertEquals(NewVersionState.UNKNOWN, results.single().getState())
+        assertEquals(1, context.unbindCount)
+    }
+
+    @Test
+    public fun `a Bazaar that predates the remote check asks for the installed version`() {
+        val context = BazaarContext(
+            bazaarVersionCode = BAZAAR_CODE_REMOTE_VERSION_SUPPORTED - 1,
+            legacyVersionCode = 1,
+        )
+        val results = mutableListOf<NewVersionStateResult>()
+
+        BazaarUpdater.getNewVersionState(context, results::add)
+        awaitResult(results)
+
+        assertEquals(NewVersionState.NEW_VERSION_AVAILABLE, results.single().getState())
+        assertEquals(1, context.legacyVersionCodeCalls)
+        assertEquals(0, context.legacyRemoteVersionCodeCalls)
+    }
+
+    @Test
+    @Suppress("DEPRECATION")
+    public fun `the deprecated check still answers a newer version`() {
+        val context = BazaarContext(legacyVersionCode = 1)
+        val results = mutableListOf<UpdateResult>()
+
+        BazaarUpdater.getLastUpdateState(context) { results += it }
+        awaitResult(results)
+
+        assertTrue(results.single().isUpdateNeeded())
+        assertEquals(1L, results.single().getTargetVersionCode())
+        assertEquals(1, context.unbindCount)
+    }
+
+    @Test
+    public fun `the deprecated check is deprecated on both overloads`() {
+        val staticCheck = BazaarUpdater::class.java.getMethod(
+            "getLastUpdateState",
+            Context::class.java,
+            OnUpdateResult::class.java,
+        )
+        val scopedCheck = BazaarUpdater::class.java.getMethod(
+            "getLastUpdateState",
+            Context::class.java,
+            CoroutineScope::class.java,
+            OnUpdateResult::class.java,
+        )
+
+        assertTrue(staticCheck.isAnnotationPresent(Deprecated::class.java))
+        assertTrue(scopedCheck.isAnnotationPresent(Deprecated::class.java))
     }
 
     @Test
@@ -248,13 +337,17 @@ public class BazaarUpdaterTest {
         private val state: NewVersionState = NewVersionState.NEW_VERSION_DOWNLOADED,
         private val stateValue: Int? = null,
         private val disconnectAfterConnect: Boolean = false,
+        private val legacyVersionCode: Long = 0,
+        private val legacyError: Boolean = false,
         isBazaarInstalled: Boolean = true,
         bazaarVersionCode: Int = BAZAAR_CODE_UPDATE_DOWNLOADED_SUPPORTED,
     ) : ContextWrapper(application) {
 
-        public var bindCount: Int = 0
-        public var unbindCount: Int = 0
-        public val startedActivities = mutableListOf<Intent>()
+        var bindCount: Int = 0
+        var unbindCount: Int = 0
+        var legacyVersionCodeCalls: Int = 0
+        var legacyRemoteVersionCodeCalls: Int = 0
+        val startedActivities = mutableListOf<Intent>()
 
         init {
             if (isBazaarInstalled) {
@@ -297,10 +390,21 @@ public class BazaarUpdaterTest {
             startedActivities += intent
         }
 
-        private val updateCheckService: IUpdateCheckService = object : IUpdateCheckService.Stub() {
-            override fun getVersionCode(packageName: String): Long = 0
+        private fun legacyVersion(): Long {
+            if (legacyError) throw RemoteException("the legacy check failed")
+            return legacyVersionCode
+        }
 
-            override fun getRemoteVersionCode(packageName: String): Long = 0
+        private val updateCheckService: IUpdateCheckService = object : IUpdateCheckService.Stub() {
+            override fun getVersionCode(packageName: String): Long {
+                legacyVersionCodeCalls++
+                return legacyVersion()
+            }
+
+            override fun getRemoteVersionCode(packageName: String): Long {
+                legacyRemoteVersionCodeCalls++
+                return legacyVersion()
+            }
 
             override fun getNewVersionState(packageName: String): Int = stateValue ?: when (state) {
                 NewVersionState.UNKNOWN -> NEW_VERSION_STATE_UNKNOWN

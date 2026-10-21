@@ -11,7 +11,7 @@ android {
         applicationId = "com.farsitel.bazaar.bazaarupdaterSample"
         minSdk = 21
         targetSdk = 34
-        versionCode = 13
+        versionCode = 14
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

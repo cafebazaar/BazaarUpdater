@@ -381,7 +381,13 @@ public object BazaarUpdater {
 
     /** This is our function to un-binds this activity from our service.  */
     private fun releaseService(context: Context) {
-        connection?.get()?.let { con -> context.unbindService(con) }
+        connection?.get()?.let { con ->
+            try {
+                context.unbindService(con)
+            } catch (ignored: IllegalArgumentException) {
+                // Already unbound, or the bind never fully registered.
+            }
+        }
         connection = null
     }
 }
